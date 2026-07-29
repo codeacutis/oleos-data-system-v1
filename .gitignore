@@ -1,0 +1,29 @@
+# Credenciais e tokens
+auth/client_secret.json
+auth/token.json
+
+# Configurações sensíveis
+config.yaml
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
