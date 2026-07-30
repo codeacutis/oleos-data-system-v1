@@ -2,7 +2,8 @@ import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import config
 from view.queries import queries as q
-from view.queries import (find_child, find_observer, avg_child_items, avg_sleep_by_parents)
+from view.queries import ( find_child, find_observer, avg_child_items, 
+                          avg_sleep_by_parents, yes_no_frequency, comportamental_diference )
 from view.db import query_execute
 import streamlit as st
 import plotly.express as px
@@ -60,6 +61,19 @@ with st.container(key="ambientes"):
     query_sleep = query_execute(avg_sleep_by_parents(option))
     fig2 = px.line(query_sleep, x='fase', y='media_valor')
     st.plotly_chart(fig2, key="grafico_sono")
+    
+    #frequência de eventos adversos ao longo das fazes
+    st.subheader("Frequência de Eventos Adversos")
+    query_adversities = query_execute(yes_no_frequency(option))
+    fig3 = px.bar(query_adversities, x='fase', y='frequencia', color="descricao")
+    st.plotly_chart(fig3, key="grafico_frequencia_eventos_adversos")
+    
+    #frequência de itens por fase
+    st.subheader("Comportamento ao ir e voltar da escola")
+    fase = st.menu_button("Fase", options=["Linha de Base", "Lavanda", "Mandarina", "Patchouli", "Ylang Ylang"])
+    query_comportamental = query_execute(comportamental_diference(option, fase))
+    st.dataframe(query_comportamental, width="stretch", hide_index=True)
+    
     
     
 

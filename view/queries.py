@@ -21,3 +21,9 @@ def avg_child_items(option):
 
 def avg_sleep_by_parents(option):
     return f'select c.codigo as codigo_crianca, ie.descricao as item, avg(r.valor_numerico) as media_valor, ob.tipo as tipo_observador, fe.nome_fase as fase from resposta r inner join item_escala ie on r.id_item = ie.id_item inner join registro re on r.id_registro = re.id_registro inner join observador ob on re.id_observador = ob.id_observador inner join crianca c on c.id_crianca = re.id_crianca inner join fase_estudo fe on re.id_fase = fe.id_fase where ob.tipo = "RESPONSAVEL" and c.codigo = "{option}" and ie.tipo_resposta = "SONO" group by codigo_crianca, item, tipo_observador, fase'
+
+def yes_no_frequency(option):
+    return f'SELECT c.codigo AS codigo_crianca, ie.descricao AS descricao, fe.nome_fase AS fase, count(*) AS frequencia FROM Resposta r INNER JOIN Item_Escala ie ON ie.id_item = r.id_item INNER JOIN Registro re ON r.id_registro = re.id_registro INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase INNER JOIN Crianca c ON c.id_crianca = re.id_crianca WHERE ie.tipo_resposta = "SIM_NAO" and r.id_opcao in (11) and c.codigo = "{option}" GROUP BY codigo_crianca, descricao, fase'
+
+def comportamental_diference(option, fase):
+    return f'SELECT re.data AS data, MAX(CASE WHEN r.id_item = 22 THEN oc.descricao END) AS foi_para_escola, MAX(CASE WHEN r.id_item = 23 THEN oc.descricao END) AS voltou_da_escola FROM Resposta r INNER JOIN Registro re ON r.id_registro = re.id_registro INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao INNER JOIN Crianca c ON c.id_crianca = re.id_crianca INNER JOIN Fase_Estudo fe ON fe.id_fase = re.id_fase WHERE r.id_item IN (22, 23) AND c.codigo = "{option}" AND fe.nome_fase = "{fase}" GROUP BY re.data ORDER BY re.data'
