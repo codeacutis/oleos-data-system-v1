@@ -22,13 +22,13 @@ observer = query_execute(find_observer(child['id_crianca'].values[0]))
 teacher = observer[observer['tipo'] == 'PROFESSOR']['nome'].values[0]
 parent = observer[observer['tipo'] == 'RESPONSAVEL']['nome'].values[0]
 
-hoje = date.today()
+today = date.today()
 databruta = pd.to_datetime((child['data_nascimento'].values[0])).date()
 idade = (
-hoje.year
+today.year
 - databruta.year
 - (
-    (hoje.month, hoje.day)
+    (today.month, today.day)
     < (databruta.month, databruta.day)
 ))
 

@@ -7,7 +7,8 @@ queries = {
     'total_criancas_turno': 'SELECT count(*) AS criancas, turno AS turno FROM Crianca GROUP BY turno',
     'criancas_por_fase': 'SELECT count(*) AS criancas, f.nome_fase AS fase from Crianca c INNER JOIN Registro r ON c.id_crianca = r.id_crianca INNER JOIN Fase_Estudo f ON f.id_fase = r.id_fase GROUP BY fase',
     'registros_por_data': 'SELECT count(*) AS registros, data FROM Registro GROUP BY data',
-    'codigos_criancas': 'SELECT codigo FROM Crianca'
+    'codigos_criancas': 'SELECT codigo FROM Crianca',
+    'nomes_fases': 'SELECT nome_fase FROM Fase_Estudo'
 }
 
 def find_child(option):
@@ -27,3 +28,9 @@ def yes_no_frequency(option):
 
 def comportamental_diference(option, fase):
     return f'SELECT re.data AS data, MAX(CASE WHEN r.id_item = 22 THEN oc.descricao END) AS foi_para_escola, MAX(CASE WHEN r.id_item = 23 THEN oc.descricao END) AS voltou_da_escola FROM Resposta r INNER JOIN Registro re ON r.id_registro = re.id_registro INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao INNER JOIN Crianca c ON c.id_crianca = re.id_crianca INNER JOIN Fase_Estudo fe ON fe.id_fase = re.id_fase WHERE r.id_item IN (22, 23) AND c.codigo = "{option}" AND fe.nome_fase = "{fase}" GROUP BY re.data ORDER BY re.data'
+
+def avg_shift(fase):
+    return f'select fe.nome_fase as fase, c.turno as turno, c.regular as regular, avg(r.valor_numerico) as media_respostas from resposta r inner join item_escala ie on r.id_item = ie.id_item inner join registro re on r.id_registro = re.id_registro inner join observador ob on re.id_observador = ob.id_observador inner join crianca c on c.id_crianca = re.id_crianca inner join fase_estudo fe on re.id_fase = fe.id_fase where ob.tipo = "PROFESSOR" and fe.nome_fase = "{fase}" and ie.tipo_resposta = "ESCALA_0_4" group by fase, regular, turno '
+
+def avg_child_items_by_domains(option, fase):
+    return f'select c.codigo as codigo_crianca, de.nome as nome_dominio, avg(r.valor_numerico) as media_valor, fe.nome_fase as fase from resposta r inner join item_escala ie on r.id_item = ie.id_item inner join registro re on r.id_registro = re.id_registro inner join fase_estudo fe on re.id_fase = fe.id_fase inner join crianca c on c.id_crianca = re.id_crianca inner join dominio_escala de on de.id_dominio = ie.id_dominio where c.codigo = "{option}" and fe.nome_fase = "{fase}" group by codigo_crianca, nome_dominio'
