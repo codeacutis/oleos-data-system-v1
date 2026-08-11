@@ -4,7 +4,10 @@ import config
 
 from view.queries import queries as q
 from view.queries import ( find_child, find_observer, avg_child_items, avg_sleep_by_parents,
-                          yes_no_frequency, comportamental_diference, avg_shift, avg_child_items_by_domains)
+                          yes_no_frequency, comportamental_diference, avg_shift, avg_child_items_by_domains,
+                          avg_domains_by_oil, avg_sleep_by_oil, yes_no_frequency_by_oil, comportamental_by_oil,
+                          avg_baseline_vs_intervention, sleep_baseline_vs_intervention,
+                          avg_by_environment, avg_sleep_by_parents_by_fase, yes_no_frequency_by_fase)
 from view.db import query_execute
 import streamlit as st
 import plotly.express as px
@@ -44,10 +47,79 @@ with st.container(key="comparacao_geral"):
             dtframe, r='media_valor', theta='nome_dominio', color='codigo_crianca'
         )
     
-    
-    
+st.header("Comparação entre Óleos Essenciais")
 
+with st.container(key="scores_por_oleo"):
+    st.subheader("Scores por Domínio")
+    df_domains = query_execute(avg_domains_by_oil())
+    fig = px.bar(df_domains, x='oleo', y='media_valor', color='dominio', barmode='group')
+    st.plotly_chart(fig, key="grafico_dominios_oleo")
+
+with st.container(key="dados_pais_oleo"):
+    st.subheader("Dados dos Pais por Óleo")
     
+    col1, col2 = st.columns(2)
     
-    
-    
+    with col1:
+        st.write("**Média de Sono**")
+        df_sleep = query_execute(avg_sleep_by_oil())
+        fig2 = px.bar(df_sleep, x='oleo', y='media_sono')
+        st.plotly_chart(fig2, key="grafico_sono_oleo")
+        
+        st.write("**Eventos Adversos**")
+        df_yesno = query_execute(yes_no_frequency_by_oil())
+        fig3 = px.bar(df_yesno, x='oleo', y='frequencia', color='pergunta', barmode='group')
+        st.plotly_chart(fig3, key="grafico_eventos_oleo")
+
+    with col2:
+        st.write("**Comportamento**")
+        df_comp = query_execute(comportamental_by_oil())
+        fig4 = px.bar(df_comp, x='oleo', y='frequencia', color='resposta', barmode='stack',
+                      facet_row='pergunta')
+        st.plotly_chart(fig4, key="grafico_comportamento_oleo")
+
+st.header("Linha de Base vs Intervenção")
+
+with st.container(key="baseline_vs_intervention"):
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("**Scores por Domínio (Professores)**")
+        df_bv = query_execute(avg_baseline_vs_intervention())
+        fig5 = px.bar(df_bv, x='dominio', y='media_valor', color='periodo', barmode='group')
+        st.plotly_chart(fig5, key="grafico_baseline_dominios")
+
+    with col2:
+        st.write("**Média de Sono (Responsáveis)**")
+        df_sleep_bv = query_execute(sleep_baseline_vs_intervention())
+        fig6 = px.bar(df_sleep_bv, x='periodo', y='media_sono')
+        st.plotly_chart(fig6, key="grafico_baseline_sono")
+
+st.header("Comparação entre Ambientes")
+
+fase_amb = st.selectbox(
+    'Selecione a fase:',
+    query_execute(q.get("nomes_fases")),
+    key="select_fase_ambiente"
+)
+
+with st.container(key="comparacao_ambientes"):
+    st.subheader("Ambiente Escolar — Scores por Domínio (Professores)")
+    df_env = query_execute(avg_by_environment(fase_amb))
+    fig7 = px.bar(df_env, x='dominio', y='media_valor')
+    st.plotly_chart(fig7, key="grafico_ambiente_dominios")
+
+    st.subheader("Ambiente Domiciliar — Dados dos Responsáveis")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("**Média de Sono**")
+        df_sleep_amb = query_execute(avg_sleep_by_parents_by_fase(fase_amb))
+        fig8 = px.bar(df_sleep_amb, x='fase', y='media_valor')
+        st.plotly_chart(fig8, key="grafico_ambiente_sono")
+
+    with col2:
+        st.write("**Eventos Adversos**")
+        df_yesno_amb = query_execute(yes_no_frequency_by_fase(fase_amb))
+        fig9 = px.bar(df_yesno_amb, x='descricao', y='frequencia')
+        st.plotly_chart(fig9, key="grafico_ambiente_eventos")
