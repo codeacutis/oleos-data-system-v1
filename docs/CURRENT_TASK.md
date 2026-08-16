@@ -41,18 +41,18 @@
 - Comparação linha de base vs intervenção
 - Comparação entre ambientes (domiciliar vs escolar)
 
----
-
-### 🔄 Em Andamento
-
 #### Dashboard — Adesão e Qualidade (`registers.py`)
 - Regularidade dos registros por criança
 - Gaps no protocolo
 - Consistência entre fontes (responsável vs professor)
 - Impacto das trocas de óleos entre fases
 
+---
+
+### 🔄 Em Andamento
+
 #### Infraestrutura
-- Segurança e controle de acesso
+- Segurança e controle de acesso (em estudo)
 - Deploy da aplicação
 - Mecanismo de backup
 
@@ -60,16 +60,12 @@
 
 ## Próximo Passo
 
-Finalizar a seção de **Comparação entre óleos essenciais** na página `comparisons.py`:
-- Scores por domínio agrupados por óleo (`avg_domains_by_oil`)
-- Média de sono por óleo (`avg_sleep_by_oil`)
-- Frequência de eventos adversos por óleo (`yes_no_frequency_by_oil`)
-- Distribuição de comportamento por óleo (`comportamental_by_oil`)
+Fase 3 — Segurança e Deploy:
+- Estudar e implementar modelo de autenticação
+- Refatorar o dashboard com controle de acesso
+- Deploy da aplicação
+- Mecanismo de backup
 
-Em seguida, implementar:
-- Comparação linha de base vs intervenção
-- Comparação entre ambientes
-- Página de Adesão e Qualidade
 
 ---
 

@@ -14,11 +14,13 @@
 - [x] Estrutura de navegação (Streamlit multipage)
 - [x] Página: Visão Geral
 - [x] Página: Análise por Criança
-- [ ] Página: Comparações (em andamento)
-- [ ] Página: Adesão dos Pais e Qualidade
+- [x] Página: Comparações (em andamento)
+- [x] Página: Adesão dos Pais e Qualidade
 
-### ⬜ Fase 3 — Segurança e Deploy
-- [ ] Controle de acesso por perfil de usuário
+### 🔄 Fase 3 — Segurança e Deploy
+- [ ] Estudo do modelo de autenticação
+- [ ] Implementação do controle de acesso por perfil (RBAC)
+- [ ] Refatoração do dashboard com autenticação
 - [ ] Proteção dos dados dos participantes
 - [ ] Deploy da aplicação
 - [ ] Mecanismo de backup
@@ -45,8 +47,9 @@
 |---|---|---|
 | Visão Geral | Como está o estudo? | ✅ Concluída |
 | Análise por Criança | Como esta criança respondeu ao protocolo? | ✅ Concluída |
-| Comparações | Quais diferenças aparecem entre óleos, ambientes e grupos? | 🔄 Em andamento |
-| Adesão e Qualidade | Os dados coletados são suficientes e consistentes? | ⬜ Pendente |
+| Comparações | Quais diferenças aparecem entre óleos, ambientes e grupos? | ✅ Concluída |
+| Adesão e Qualidade | Os dados coletados são suficientes e consistentes? | ✅ Concluída |
+
 
 ---
 

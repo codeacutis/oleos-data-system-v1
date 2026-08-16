@@ -81,36 +81,48 @@ app.py
 
 ### ETL
 
-* Extração automática dos dados dos formulários
-* Transformação dos dados coletados
+* Extração automática dos dados dos formulários via Google Sheets API
+* Transformação e padronização dos dados coletados
 * Separação dos registros de responsáveis e professores
-* Tratamento das respostas
-* Persistência no banco de dados
+* Tratamento das respostas por tipo (escala, categórico, sono, sim/não)
+* Persistência no banco de dados MySQL
 
 ### Dashboard
 
-* Visão geral da pesquisa
-* Total de crianças cadastradas
-* Total de responsáveis
-* Total de professores
+**Visão Geral**
+* Total de crianças, responsáveis e professores cadastrados
 * Distribuição de participantes por turno
-* Quantidade de questionários respondidos por fase
-* Distribuição das crianças durante o protocolo
+* Quantidade de registros respondidos por fase
 * Linha do tempo dos registros
+
+**Análise por Criança**
+* Resumo individual: código, idade, turno, professor e responsável
+* Evolução dos scores por item — linha de base vs fases de intervenção
+* Evolução do sono por fase
+* Frequência de eventos adversos por fase
+* Comportamento ao ir e voltar da escola por fase
+
+**Comparações**
+* Média de scores por turno e turno regular agrupada por fase
+* Comparação entre duas crianças por domínio (gráfico radar)
+* Comparação entre óleos essenciais: scores por domínio, sono, eventos adversos e comportamento
+* Linha de base vs intervenção: scores por domínio e média de sono
+* Comparação entre ambientes: escolar (professores) e domiciliar (responsáveis)
+
+**Adesão e Qualidade**
+* Adesão ao protocolo por responsável e fase
+* Evolução e distribuição do sentimento dos responsáveis por fase
+* Frequência de resistência ao óleo por fase
+* Frequência de mudanças na rotina por fase
 
 ---
 
 ## Em desenvolvimento
 
-O projeto continua em evolução. Entre as funcionalidades previstas estão:
-
-* Novas análises estatísticas
-* Comparações entre fases do protocolo
-* Melhorias na interface do dashboard
-* Exportação de relatórios
-* Novos indicadores para os pesquisadores
-* Melhorias na documentação
+* Controle de acesso e autenticação por perfil de usuário
+* Proteção dos dados dos participantes
 * Deploy da aplicação
+* Mecanismo de backup
 
 ---
 
@@ -158,9 +170,7 @@ streamlit run view/main.py
 
 ## Status
 
-🚧 Projeto em desenvolvimento.
-
-Este projeto está sendo desenvolvido como parte de uma pesquisa científica e continua recebendo novas funcionalidades e melhorias conforme o avanço do estudo.
+O pipeline ETL e as 4 páginas do dashboard estão concluídos. O projeto encontra-se na fase de segurança e deploy.
 
 ---
 
