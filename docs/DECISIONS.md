@@ -73,3 +73,43 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 **Decisão**: As análises de comparação entre óleos essenciais excluem automaticamente a fase de linha de base.
 
 **Motivo**: A linha de base não possui óleo associado (`id_oleo = NULL`). O uso de `INNER JOIN` com a tabela `Oleo` garante a exclusão automática dessa fase nas queries relevantes.
+
+---
+
+## DEC10 — Substituição de nomes por códigos no dashboard
+
+**Decisão**: Nomes de responsáveis e professores foram substituídos por códigos (`OB001`, `OB002`...) em todas as visualizações do dashboard.
+
+**Motivo**: Nomes são dados pessoais sensíveis sob a LGPD. A coluna `codigo` foi adicionada à tabela `Observador` e populada com o padrão `CONCAT('OB', LPAD(id_observador, 3, '0'))`. O campo `diagnostico` também foi removido das queries por ser redundante (todos os participantes têm TEA).
+
+---
+
+## DEC11 — Padding de linhas no transform
+
+**Decisão**: Antes de criar o DataFrame, cada linha de resposta é completada com strings vazias até atingir o tamanho do cabeçalho.
+
+**Motivo**: A Google Sheets API omite células vazias do final de cada linha. Sem o padding, linhas com respostas faltantes causam `ValueError` ao criar o DataFrame com colunas fixas.
+
+---
+
+## DEC13 — Sono armazenado como opção categórica
+
+**Decisão**: As queries de sono usam `CASE WHEN` sobre `Opcao_Categorica.descricao` para converter as respostas em valores numéricos antes de calcular a média.
+
+**Motivo**: O item de sono é respondido com opções categóricas ("menos de 4h", "4h", "6h", "8h", "mais de 8h") e salvo em `id_opcao`, não em `valor_numerico`. Usar `avg(valor_numerico)` retornava sempre `NULL`. O mapeamento via `CASE WHEN` permite calcular médias significativas.
+
+---
+
+## DEC14 — Pasta `pages/` renomeada para `sections/`
+
+**Decisão**: A pasta `view/pages/` foi renomeada para `view/sections/`.
+
+**Motivo**: O Streamlit detecta automaticamente arquivos dentro de qualquer pasta chamada `pages/` e os exibe na navegação, independente do estado de autenticação. Renomear para `sections/` elimina esse comportamento e garante que as páginas só sejam acessíveis após login.
+
+---
+
+## DEC15 — Autenticação com login único
+
+**Decisão**: O dashboard utiliza `streamlit-authenticator` com login único, sem RBAC. Todos os usuários autenticados têm acesso às mesmas páginas.
+
+**Motivo**: O sistema é destinado exclusivamente a pesquisadores com perfil de consulta. Não há necessidade de controle granular de acesso. As credenciais são armazenadas em `.streamlit/secrets.toml` com senhas em hash bcrypt.

@@ -43,15 +43,19 @@ etl-oleos/
 │   └── seed.py               # População estática do banco (IDs hardcoded)
 │
 ├── view/
-│   ├── main.py               # Entry point do Streamlit (st.navigation)
+│   ├── main.py               # Entry point do Streamlit (autenticação + st.navigation)
 │   ├── config.py             # Configuração do sys.path
 │   ├── db.py                 # Conexão cacheada e execução de queries
 │   ├── queries.py            # Queries SQL estáticas e funções dinâmicas
-│   └── pages/
+│   └── sections/
 │       ├── general.py        # Página: Visão Geral
 │       ├── children.py       # Página: Análise por Criança
 │       ├── comparisons.py    # Página: Comparações
 │       └── registers.py      # Página: Adesão e Qualidade
+│
+├── .streamlit/
+│   ├── config.toml           # Configurações do Streamlit
+│   └── secrets.toml          # Credenciais de acesso (não versionado)
 │
 ├── app.py                    # Execução do processo ETL completo
 ├── config.yaml               # Configurações dos formulários (não versionado)
@@ -76,7 +80,7 @@ Recebe os dados brutos extraídos e os transforma para o formato esperado pelo b
 Contém as funções de persistência no banco MySQL. O `seed.py` popula os dados estáticos (crianças, observadores, fases, óleos, itens de escala). O `database_loader.py` contém as funções `get_*` e `load_*` para inserção dos registros.
 
 ### view
-Camada de visualização desenvolvida em Streamlit. Organizada em páginas independentes dentro de `pages/`. O `db.py` utiliza `@st.cache_resource` para manter a conexão com o banco entre reruns.
+Camada de visualização desenvolvida em Streamlit. Organizada em páginas independentes dentro de `sections/` (renomeada de `pages/` para evitar detecção automática pelo Streamlit). O `main.py` gerencia a autenticação com `streamlit-authenticator` antes de renderizar a navegação. O `db.py` utiliza `@st.cache_resource` para manter a conexão com o banco entre reruns.
 
 ---
 

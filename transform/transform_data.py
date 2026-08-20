@@ -3,7 +3,9 @@ import pandas as pd
 
 def transform_teacher_data(form):
     data = form["value"]
-    df = pd.DataFrame(data[1:], columns=data[0])
+    header = data[0]
+    rows = [row + [""] * (len(header) - len(row)) for row in data[1:]]
+    df = pd.DataFrame(rows, columns=header)
     df.columns = (
         df.columns
         .str.strip()
@@ -39,13 +41,16 @@ def transform_teacher_data(form):
 
 def transform_parents_data(form):
     data = form["value"]
-    df = pd.DataFrame(data[1:], columns=data[0])
+    header = data[0]
+    rows = [row + [""] * (len(header) - len(row)) for row in data[1:]]
+    df = pd.DataFrame(rows, columns=header)
     df.columns = (
         df.columns
         .str.strip()
         .str.lower()
         .str.replace(" ", "_")
     )
+    df["carimbo_de_data/hora"] = pd.to_datetime(df["carimbo_de_data/hora"], dayfirst=True).dt.date
     
     colunas_metadados = ["carimbo_de_data/hora", "qual_o_código_da_criança_que_está_sendo_observada?", "dia_de_avaliação"]
     colunas_resposta = [

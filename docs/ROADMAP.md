@@ -10,19 +10,20 @@
 - [x] Carga no banco MySQL
 - [x] População estática do banco (seed)
 
-### 🔄 Fase 2 — Dashboard de Visualização
+### ✅ Fase 2 — Dashboard de Visualização
 - [x] Estrutura de navegação (Streamlit multipage)
 - [x] Página: Visão Geral
 - [x] Página: Análise por Criança
-- [x] Página: Comparações (em andamento)
-- [x] Página: Adesão dos Pais e Qualidade
+- [x] Página: Comparações
+- [x] Página: Adesão e Qualidade
 
 ### 🔄 Fase 3 — Segurança e Deploy
-- [ ] Estudo do modelo de autenticação
-- [ ] Implementação do controle de acesso por perfil (RBAC)
-- [ ] Refatoração do dashboard com autenticação
-- [ ] Proteção dos dados dos participantes
-- [ ] Deploy da aplicação
+- [x] Autenticação com `streamlit-authenticator`
+- [x] Credenciais em `st.secrets`
+- [x] Proteção das páginas por login
+- [ ] Migrar banco MySQL para nuvem
+- [ ] Deploy no Streamlit Community Cloud
+- [ ] Configurar GitHub Actions para ETL diário
 - [ ] Mecanismo de backup
 
 ---

@@ -36,43 +36,45 @@ else:
 
 st.header("Sentimento dos Responsáveis")
 
-col_left, col_right = st.columns([2, 1], gap="large")
+fase_sentimento = st.selectbox(
+    "Selecione a fase:",
+    query_execute(q.get("nomes_fases")),
+    key="select_fase_sentimento"
+)
+
+df_feeling = query_execute(feeling_by_fase(fase_sentimento))
+
+col_left, col_right = st.columns(2)
 
 with col_left:
-    st.subheader("Evolução por Fase")
-    df_feeling_evo = query_execute(feeling_evolution())
-    if df_feeling_evo.empty:
-        st.info("Nenhum registro encontrado.")
-    else:
-        fig2 = px.bar(
-            df_feeling_evo,
-            x="fase",
-            y="frequencia",
-            color="sentimento",
-            barmode="stack",
-            labels={"frequencia": "Frequência", "fase": "Fase", "sentimento": "Sentimento"},
-        )
-        st.plotly_chart(fig2, key="grafico_sentimento_evolucao")
-
-with col_right:
-    st.subheader("Distribuição por Fase")
-    fase_sentimento = st.selectbox(
-        "Selecione a fase:",
-        query_execute(q.get("nomes_fases")),
-        key="select_fase_sentimento"
-    )
-    df_feeling = query_execute(feeling_by_fase(fase_sentimento))
+    st.subheader("Frequência por Sentimento")
     if df_feeling.empty:
         st.info("Nenhum registro encontrado.")
     else:
-        fig3 = px.pie(
-            df_feeling,
-            names="sentimento",
-            values="frequencia",
-            hole=0.45,
-        )
-        fig3.update_traces(textposition="inside", textinfo="percent+label")
-        st.plotly_chart(fig3, key="grafico_sentimento_donut")
+        fig_bar = px.bar(df_feeling, x="sentimento", y="frequencia",
+                         barmode="group",
+                         labels={"frequencia": "Frequência", "sentimento": "Sentimento"},
+                         color="sentimento")
+        st.plotly_chart(fig_bar, key="grafico_sentimento_barra")
+
+with col_right:
+    st.subheader("Distribuição (%)")
+    if df_feeling.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig_pie = px.pie(df_feeling, names="sentimento", values="frequencia", hole=0.45)
+        fig_pie.update_traces(textposition="inside", textinfo="percent+label")
+        st.plotly_chart(fig_pie, key="grafico_sentimento_donut")
+
+st.subheader("Comparativo entre Fases")
+df_feeling_evo = query_execute(feeling_evolution())
+if df_feeling_evo.empty:
+    st.info("Nenhum registro encontrado.")
+else:
+    fig_evo = px.bar(df_feeling_evo, x="fase", y="frequencia", color="sentimento",
+                     barmode="group",
+                     labels={"frequencia": "Frequência", "fase": "Fase", "sentimento": "Sentimento"})
+    st.plotly_chart(fig_evo, key="grafico_sentimento_evolucao")
 
 # ── 3. Resistência ao óleo ────────────────────────────────────────────────────
 
@@ -88,6 +90,7 @@ else:
         x="fase",
         y="frequencia",
         labels={"frequencia": "Ocorrências", "fase": "Fase"},
+        color="fase"
     )
     st.plotly_chart(fig4, key="grafico_resistencia")
 
@@ -105,5 +108,6 @@ else:
         x="fase",
         y="frequencia",
         labels={"frequencia": "Ocorrências", "fase": "Fase"},
+        color="fase"
     )
     st.plotly_chart(fig5, key="grafico_rotina")

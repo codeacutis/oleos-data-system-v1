@@ -27,21 +27,35 @@ with st.container(key="metricas"):
 
 with st.container(key="criancas_por_turno"):
     st.header("Distribuição de Crianças por Turno")
-    st.bar_chart(total_children_turn, x='turno', y='criancas', x_label="Turnos", y_label="Quantidade de Crianças")
+    if total_children_turn.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        st.bar_chart(total_children_turn, x='turno', y='criancas', x_label="Turnos", y_label="Quantidade de Crianças")
 
 with st.container(key="questionários_respondidos"):
     st.header("Quantidade de questionários respondidos por fase")
-    st.bar_chart(total_register, x='fase', y='total_registros', x_label="Fase", y_label="Questionários Respondidos", horizontal=True)
+    if total_register.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        st.bar_chart(total_register, x='fase', y='total_registros', x_label="Fase", y_label="Questionários Respondidos", horizontal=True)
 
 with st.container(key="criancas_por_oleo"):
     st.header("Distribuição de Crianças por Óleo")
-    fig = px.pie(total_children_by_fase, values='criancas', names='fase')
-    st.plotly_chart(fig)
+    if total_children_by_fase.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig = px.pie(total_children_by_fase, values='criancas', names='fase',
+                     labels={'criancas': 'Crianças', 'fase': 'Fase'})
+        st.plotly_chart(fig)
 
 with st.container(key="linha_tempo"):
     st.header("Linha do Tempo de Registros")
-    fig = px.line(register_by_date, x="data", y="registros")
-    st.plotly_chart(fig)
+    if register_by_date.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig = px.line(register_by_date, x="data", y="registros",
+                      labels={'data': 'Data', 'registros': 'Registros'})
+        st.plotly_chart(fig)
 
 
 

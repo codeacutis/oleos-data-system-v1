@@ -4,6 +4,7 @@ auth/token.json
 
 # Configurações sensíveis
 config.yaml
+auth.yaml
 
 # Ambiente virtual
 venv/

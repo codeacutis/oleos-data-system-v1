@@ -13,19 +13,19 @@ queries = {
 
 def find_child(option):
     return f'''
-        SELECT *
+        SELECT id_crianca, codigo, data_nascimento, sexo, turno, regular
         FROM Crianca
         WHERE codigo = "{option}"
     '''
 
 def find_observer(id_crianca):
     return f'''
-        SELECT ob.nome, ob.tipo
+        SELECT ob.codigo, ob.tipo
         FROM Observador ob
         LEFT JOIN observador_crianca oc ON oc.id_observador = ob.id_observador
         LEFT JOIN crianca c ON c.id_crianca = oc.id_crianca
         WHERE c.id_crianca = {id_crianca}
-        GROUP BY ob.nome, ob.tipo
+        GROUP BY ob.codigo, ob.tipo
     '''
 
 def avg_child_items(option):
@@ -36,21 +36,31 @@ def avg_child_items(option):
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
-        WHERE c.codigo = "{option}"
+        INNER JOIN observador ob ON re.id_observador = ob.id_observador
+        WHERE c.codigo = "{option}" AND ie.tipo_resposta = "ESCALA_0_4" AND ob.tipo = "PROFESSOR"
         GROUP BY codigo_crianca, item, nome_fase
     '''
 
 def avg_sleep_by_parents(option):
     return f'''
-        SELECT c.codigo AS codigo_crianca, ie.descricao AS item, avg(r.valor_numerico) AS media_valor, ob.tipo AS tipo_observador, fe.nome_fase AS fase
+        SELECT c.codigo AS codigo_crianca, avg(
+            CASE oc.descricao
+                WHEN "menos de 4h" THEN 2
+                WHEN "4h" THEN 4
+                WHEN "6h" THEN 6
+                WHEN "8h" THEN 8
+                WHEN "mais de 8h" THEN 10
+            END
+        ) AS media_valor, ob.tipo AS tipo_observador, fe.nome_fase AS fase
         FROM resposta r
+        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
         WHERE ob.tipo = "RESPONSAVEL" AND c.codigo = "{option}" AND ie.tipo_resposta = "SONO"
-        GROUP BY codigo_crianca, item, tipo_observador, fase
+        GROUP BY codigo_crianca, tipo_observador, fase
     '''
 
 def yes_no_frequency(option):
@@ -121,8 +131,17 @@ def avg_domains_by_oil():
 
 def avg_sleep_by_oil():
     return '''
-        SELECT o.nome AS oleo, avg(r.valor_numerico) AS media_sono
+        SELECT o.nome AS oleo, avg(
+            CASE oc.descricao
+                WHEN "menos de 4h" THEN 2
+                WHEN "4h" THEN 4
+                WHEN "6h" THEN 6
+                WHEN "8h" THEN 8
+                WHEN "mais de 8h" THEN 10
+            END
+        ) AS media_sono
         FROM Resposta r
+        INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN Item_Escala ie ON r.id_item = ie.id_item
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
@@ -176,8 +195,17 @@ def sleep_baseline_vs_intervention():
     return '''
         SELECT
             CASE WHEN fe.id_oleo IS NULL THEN "Linha de Base" ELSE "Intervenção" END AS periodo,
-            avg(r.valor_numerico) AS media_sono
+            avg(
+                CASE oc.descricao
+                    WHEN "menos de 4h" THEN 2
+                    WHEN "4h" THEN 4
+                    WHEN "6h" THEN 6
+                    WHEN "8h" THEN 8
+                    WHEN "mais de 8h" THEN 10
+                END
+            ) AS media_sono
         FROM Resposta r
+        INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN Item_Escala ie ON r.id_item = ie.id_item
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
@@ -218,8 +246,17 @@ def sleep_by_environment(fase):
 
 def avg_sleep_by_parents_by_fase(fase):
     return f'''
-        SELECT avg(r.valor_numerico) AS media_valor, fe.nome_fase AS fase
+        SELECT avg(
+            CASE oc.descricao
+                WHEN "menos de 4h" THEN 2
+                WHEN "4h" THEN 4
+                WHEN "6h" THEN 6
+                WHEN "8h" THEN 8
+                WHEN "mais de 8h" THEN 10
+            END
+        ) AS media_valor, fe.nome_fase AS fase
         FROM Resposta r
+        INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN Item_Escala ie ON r.id_item = ie.id_item
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
@@ -243,7 +280,7 @@ def yes_no_frequency_by_fase(fase):
 
 def adhesion_by_responsible():
     return '''
-        SELECT ob.nome AS responsavel, fe.nome_fase AS fase, count(*) AS total_registros
+        SELECT ob.codigo AS responsavel, fe.nome_fase AS fase, count(*) AS total_registros
         FROM Registro re
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase

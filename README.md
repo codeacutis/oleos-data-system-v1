@@ -68,6 +68,7 @@ app.py
 
 * Python
 * Streamlit
+* Streamlit Authenticator
 * MySQL
 * Google Sheets API
 * Google Forms
@@ -111,17 +112,27 @@ app.py
 
 **Adesão e Qualidade**
 * Adesão ao protocolo por responsável e fase
-* Evolução e distribuição do sentimento dos responsáveis por fase
+* Sentimento dos responsáveis: frequência e distribuição por fase selecionada
+* Comparativo do sentimento entre todas as fases
 * Frequência de resistência ao óleo por fase
 * Frequência de mudanças na rotina por fase
 
 ---
 
+## Segurança
+
+* Autenticação com `streamlit-authenticator` — login obrigatório para acesso ao dashboard
+* Senhas armazenadas com hash bcrypt
+* Credenciais em `.streamlit/secrets.toml` (não versionado)
+* Identificação de participantes por código (`CR001`, `OB001`) — nomes e diagnósticos não expostos
+
+---
+
 ## Em desenvolvimento
 
-* Controle de acesso e autenticação por perfil de usuário
-* Proteção dos dados dos participantes
-* Deploy da aplicação
+* Migração do banco MySQL para nuvem
+* Deploy no Streamlit Community Cloud
+* GitHub Actions para ETL diário
 * Mecanismo de backup
 
 ---
@@ -142,17 +153,13 @@ pip install -r requirements.txt
 
 ### 3. Configure as credenciais
 
-Crie um arquivo `config.yaml` utilizando como base o arquivo:
+Crie o arquivo `config.yaml` a partir do template:
 
 ```text
 config.yaml.example
 ```
 
-Configure:
-
-* credenciais da Google API;
-* acesso ao banco de dados;
-* demais parâmetros da aplicação.
+Crie o arquivo `.streamlit/secrets.toml` com as credenciais de acesso ao dashboard e ao banco de dados.
 
 ### 4. Execute o processo ETL
 
@@ -170,7 +177,7 @@ streamlit run view/main.py
 
 ## Status
 
-O pipeline ETL e as 4 páginas do dashboard estão concluídos. O projeto encontra-se na fase de segurança e deploy.
+O pipeline ETL, as 4 páginas do dashboard e a autenticação estão concluídos. O projeto encontra-se na fase de deploy.
 
 ---
 
@@ -184,6 +191,7 @@ Durante o desenvolvimento deste projeto foram aplicados conceitos de:
 * Banco de dados relacional
 * Visualização de dados
 * Desenvolvimento de dashboards
+* Segurança e autenticação de usuários
 * Organização em camadas
 * Automação de processos de coleta de dados
 

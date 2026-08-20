@@ -19,6 +19,6 @@ Python, MySQL e Streamlit/Plotly Express
 - [x] Transformação
 - [x] Modelagem de Banco de Dados
 - [x] Carga em banco de dados
-- [] Estrutura de Visualização
+- [x] Estrutura de Visualização
 - [] Segurança
 - [] Deploy

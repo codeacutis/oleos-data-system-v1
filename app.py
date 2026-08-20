@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 # %%
 from extract.sheets_extractor import extractor_all_sheets
 from transform.transform_data import transform_teacher_data

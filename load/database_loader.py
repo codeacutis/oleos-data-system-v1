@@ -31,7 +31,7 @@ def get_id_child(cursor, codigo):
         return result[0]
 
 def get_id_observer(cursor, id_crianca, tipo):
-    select_query = "SELECT id_observador FROM Observador AS o INNER JOIN Observador_Crianca AS obs ON o.id_observador = obs.id_observador WHERE obs.id_crianca = (%s) AND o.tipo = (%s)"
+    select_query = "SELECT o.id_observador FROM Observador AS o INNER JOIN Observador_Crianca AS obs ON o.id_observador = obs.id_observador WHERE obs.id_crianca = (%s) AND o.tipo = (%s)"
     cursor.execute(select_query, (id_crianca, tipo))
     result = cursor.fetchone()
 
@@ -41,12 +41,13 @@ def get_id_observer(cursor, id_crianca, tipo):
         return result[0]
 
 def get_id_item(cursor, descricao):
+    descricao_normalizada = descricao.replace("_", " ")
     select_query = "SELECT id_item FROM Item_Escala WHERE descricao = (%s)"
-    cursor.execute(select_query, (descricao,))
+    cursor.execute(select_query, (descricao_normalizada,))
     result = cursor.fetchone()
     
     if result is None:
-        raise ValueError (f"Não foi possível encontrar o id do item para a descrição: {descricao}")
+        raise ValueError (f"Não foi possível encontrar o id do item para a descrição: {descricao_normalizada}")
     else:
         return result[0]
 

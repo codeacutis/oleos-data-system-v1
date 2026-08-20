@@ -1,8 +1,8 @@
 google-api-python-client
 google-auth
 PyYAML
-mysql-conector-python
+mysql-connector-python
 retry
 streamlit
-
+streamlit-authenticator
 

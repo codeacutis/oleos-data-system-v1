@@ -19,8 +19,8 @@ option = st.selectbox(
 
 child = query_execute(find_child(option))
 observer = query_execute(find_observer(child['id_crianca'].values[0]))
-teacher = observer[observer['tipo'] == 'PROFESSOR']['nome'].values[0]
-parent = observer[observer['tipo'] == 'RESPONSAVEL']['nome'].values[0]
+teacher = observer[observer['tipo'] == 'PROFESSOR']['codigo'].values[0]
+parent = observer[observer['tipo'] == 'RESPONSAVEL']['codigo'].values[0]
 
 today = date.today()
 databruta = pd.to_datetime((child['data_nascimento'].values[0])).date()
@@ -49,30 +49,41 @@ with st.container(key="informaçoes"):
 with st.container(key="comparacao"):
     st.header("Média por Item - Linha de Base x Óleo")
     query_item = query_execute(avg_child_items(option))
-    fig = px.bar(query_item, x='item', y='media_valor', color="fase", barmode="group")
-    st.plotly_chart(fig, key="grafico_linhaBaseXoleos")
+    if query_item.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig = px.bar(query_item, x='item', y='media_valor', color="fase", barmode="group",
+                     labels={'item': 'Item', 'media_valor': 'Média', 'fase': 'Fase'})
+        st.plotly_chart(fig, key="grafico_linhaBaseXoleos")
     
 #comparação entre ambientes
 with st.container(key="ambientes"):
     st.header("Média por Item - Ambiente Domiciliar")
     
-    #evolução do sono ao longo das fases
     st.subheader("Evolução do Sono")
     query_sleep = query_execute(avg_sleep_by_parents(option))
-    fig2 = px.line(query_sleep, x='fase', y='media_valor')
-    st.plotly_chart(fig2, key="grafico_sono")
+    if query_sleep.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig2 = px.line(query_sleep, x='fase', y='media_valor',
+                       labels={'fase': 'Fase', 'media_valor': 'Média de Sono (h)'})
+        st.plotly_chart(fig2, key="grafico_sono")
     
-    #frequência de eventos adversos ao longo das fazes
     st.subheader("Frequência de Eventos Adversos")
     query_adversities = query_execute(yes_no_frequency(option))
-    fig3 = px.bar(query_adversities, x='fase', y='frequencia', color="descricao")
-    st.plotly_chart(fig3, key="grafico_frequencia_eventos_adversos")
+    if query_adversities.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        st.bar_chart(query_adversities, x='fase', y='frequencia', color="descricao", stack=False,
+                     x_label="Fase", y_label="Frequência")
     
-    #frequência de itens por fase
     st.subheader("Comportamento ao ir e voltar da escola")
-    fase = st.menu_button("Fase", options=["Linha de Base", "Lavanda", "Mandarina", "Patchouli", "Ylang Ylang"])
+    fase = st.selectbox("Fase", query_execute(q.get("nomes_fases")), key="select_fase_comportamental")
     query_comportamental = query_execute(comportamental_diference(option, fase))
-    st.dataframe(query_comportamental, width="stretch", hide_index=True)
+    if query_comportamental.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        st.dataframe(query_comportamental, width="stretch", hide_index=True)
     
     
     

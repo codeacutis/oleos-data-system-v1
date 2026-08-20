@@ -1,3 +1,6 @@
 [server]
 runOnSave = true
-fileWatcherType = "watchdog"    
+fileWatcherType = "watchdog"
+
+[pages]
+autoDiscoverPages = false
