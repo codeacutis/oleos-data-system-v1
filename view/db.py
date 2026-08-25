@@ -8,6 +8,6 @@ def connection():
     mydb = get_connection()
     return mydb
 
-def query_execute(query):
+def query_execute(query, params=None):
     mydb = connection()
-    return pd.read_sql_query(query, mydb)
+    return pd.read_sql_query(query, mydb, params=params)

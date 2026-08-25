@@ -42,7 +42,7 @@ fase_sentimento = st.selectbox(
     key="select_fase_sentimento"
 )
 
-df_feeling = query_execute(feeling_by_fase(fase_sentimento))
+df_feeling = query_execute(*feeling_by_fase(fase_sentimento))
 
 col_left, col_right = st.columns(2)
 

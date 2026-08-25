@@ -17,8 +17,8 @@ option = st.selectbox(
     query_execute(q.get("codigos_criancas"))
     )
 
-child = query_execute(find_child(option))
-observer = query_execute(find_observer(child['id_crianca'].values[0]))
+child = query_execute(*find_child(option))
+observer = query_execute(*find_observer(int(child['id_crianca'].values[0])))
 teacher = observer[observer['tipo'] == 'PROFESSOR']['codigo'].values[0]
 parent = observer[observer['tipo'] == 'RESPONSAVEL']['codigo'].values[0]
 
@@ -48,7 +48,7 @@ with st.container(key="informaçoes"):
 #comparação linha de base x óleo
 with st.container(key="comparacao"):
     st.header("Média por Item - Linha de Base x Óleo")
-    query_item = query_execute(avg_child_items(option))
+    query_item = query_execute(*avg_child_items(option))
     if query_item.empty:
         st.info("Nenhum registro encontrado.")
     else:
@@ -61,7 +61,7 @@ with st.container(key="ambientes"):
     st.header("Média por Item - Ambiente Domiciliar")
     
     st.subheader("Evolução do Sono")
-    query_sleep = query_execute(avg_sleep_by_parents(option))
+    query_sleep = query_execute(*avg_sleep_by_parents(option))
     if query_sleep.empty:
         st.info("Nenhum registro encontrado.")
     else:
@@ -70,7 +70,7 @@ with st.container(key="ambientes"):
         st.plotly_chart(fig2, key="grafico_sono")
     
     st.subheader("Frequência de Eventos Adversos")
-    query_adversities = query_execute(yes_no_frequency(option))
+    query_adversities = query_execute(*yes_no_frequency(option))
     if query_adversities.empty:
         st.info("Nenhum registro encontrado.")
     else:
@@ -79,7 +79,7 @@ with st.container(key="ambientes"):
     
     st.subheader("Comportamento ao ir e voltar da escola")
     fase = st.selectbox("Fase", query_execute(q.get("nomes_fases")), key="select_fase_comportamental")
-    query_comportamental = query_execute(comportamental_diference(option, fase))
+    query_comportamental = query_execute(*comportamental_diference(option, fase))
     if query_comportamental.empty:
         st.info("Nenhum registro encontrado.")
     else:

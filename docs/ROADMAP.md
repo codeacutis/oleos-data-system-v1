@@ -21,6 +21,9 @@
 - [x] Autenticação com `streamlit-authenticator`
 - [x] Credenciais em `st.secrets`
 - [x] Proteção das páginas por login
+- [x] Rate limiting (bloqueio após 5 tentativas falhas)
+- [x] Proteção contra SQL Injection (queries parametrizadas)
+- [x] Auditoria de acesso (LOGIN, LOGIN_FALHA, LOGOUT)
 - [ ] Migrar banco MySQL para nuvem
 - [ ] Deploy no Streamlit Community Cloud
 - [ ] Configurar GitHub Actions para ETL diário

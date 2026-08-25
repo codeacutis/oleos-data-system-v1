@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import config
 import streamlit as st
 import streamlit_authenticator as stauth
+from load.db_connection import get_connection
 
 PAGES = [
     st.Page("sections/general.py", title="Visão Geral"),
@@ -25,10 +26,46 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=st.secrets["cookie"]["expiry_days"]
 )
 
+MAX_LOGIN_ATTEMPTS = 5
+
+def audit_log(usuario, acao):
+    try:
+        mydb = get_connection()
+        cursor = mydb.cursor()
+        cursor.execute(
+            "INSERT INTO Auditoria (usuario, acao) VALUES (%s, %s)",
+            (usuario, acao)
+        )
+        mydb.commit()
+        cursor.close()
+        mydb.close()
+    except Exception:
+        pass
+
+if st.session_state.get("logout") is True and not st.session_state.get("_logout_registered"):
+    audit_log(st.session_state.get("_current_user"), "LOGOUT")
+    st.session_state["_logout_registered"] = True
+
 if not st.session_state.get("authentication_status"):
     st.navigation(PAGES, position="hidden")
+
+    blocked = any(
+        dict(data).get("failed_login_attempts", 0) >= MAX_LOGIN_ATTEMPTS
+        for data in st.secrets["credentials"]["usernames"].values()
+    )
+
+    if blocked:
+        st.error("Acesso temporariamente bloqueado. Entre em contato com o administrador.")
+        st.stop()
+
+    prev_status = st.session_state.get("authentication_status")
     authenticator.login(location="main")
-    if st.session_state.get("authentication_status") is False:
+    curr_status = st.session_state.get("authentication_status")
+
+    if curr_status is True and prev_status is not True:
+        audit_log(st.session_state.get("username"), "LOGIN")
+    elif curr_status is False and prev_status is not False:
+        audit_log(st.session_state.get("username", "desconhecido"), "LOGIN_FALHA")
         st.error("Usuário ou senha incorretos.")
     else:
         st.info("Por favor, faça login para acessar o sistema.")
@@ -36,6 +73,9 @@ if not st.session_state.get("authentication_status"):
 
 with st.sidebar:
     st.write(f"Olá, {st.session_state['name']}")
+    st.session_state["_current_user"] = st.session_state.get("username")
+    if not st.session_state.get("logout"):
+        st.session_state["_logout_registered"] = False
     authenticator.logout("Sair")
 
 st.navigation(PAGES, position="sidebar").run()

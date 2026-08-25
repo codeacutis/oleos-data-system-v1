@@ -23,7 +23,7 @@ fase = st.selectbox(
     )
 
 with st.container(key="comparacao_geral"):
-    query_shift = query_execute(avg_shift(fase))
+    query_shift = query_execute(*avg_shift(fase))
     if query_shift.empty:
         st.info("Nenhum registro encontrado.")
     else:
@@ -46,7 +46,7 @@ with st.container(key="comparacao_geral"):
             key="select_child2"
             )
     with col_center:
-        dtframe = pd.concat([query_execute(avg_child_items_by_domains(child1, fase)), query_execute(avg_child_items_by_domains(child2, fase))])
+        dtframe = pd.concat([query_execute(*avg_child_items_by_domains(child1, fase)), query_execute(*avg_child_items_by_domains(child2, fase))])
         if dtframe.empty:
             st.info("Nenhum registro encontrado.")
         else:
@@ -136,7 +136,7 @@ fase_amb = st.selectbox(
 
 with st.container(key="comparacao_ambientes"):
     st.subheader("Ambiente Escolar — Scores por Domínio (Professores)")
-    df_env = query_execute(avg_by_environment(fase_amb))
+    df_env = query_execute(*avg_by_environment(fase_amb))
     if df_env.empty:
         st.info("Nenhum registro encontrado.")
     else:
@@ -149,7 +149,7 @@ with st.container(key="comparacao_ambientes"):
 
     with col1:
         st.write("**Média de Sono**")
-        df_sleep_amb = query_execute(avg_sleep_by_parents_by_fase(fase_amb))
+        df_sleep_amb = query_execute(*avg_sleep_by_parents_by_fase(fase_amb))
         if df_sleep_amb.empty:
             st.info("Nenhum registro encontrado.")
         else:
@@ -159,7 +159,7 @@ with st.container(key="comparacao_ambientes"):
 
     with col2:
         st.write("**Eventos Adversos**")
-        df_yesno_amb = query_execute(yes_no_frequency_by_fase(fase_amb))
+        df_yesno_amb = query_execute(*yes_no_frequency_by_fase(fase_amb))
         if df_yesno_amb.empty:
             st.info("Nenhum registro encontrado.")
         else:

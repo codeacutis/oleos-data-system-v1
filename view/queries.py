@@ -12,24 +12,31 @@ queries = {
 }
 
 def find_child(option):
-    return f'''
+    return (
+        '''
         SELECT id_crianca, codigo, data_nascimento, sexo, turno, regular
         FROM Crianca
-        WHERE codigo = "{option}"
-    '''
+        WHERE codigo = %s
+        ''',
+        (option,)
+    )
 
 def find_observer(id_crianca):
-    return f'''
+    return (
+        '''
         SELECT ob.codigo, ob.tipo
         FROM Observador ob
         LEFT JOIN observador_crianca oc ON oc.id_observador = ob.id_observador
         LEFT JOIN crianca c ON c.id_crianca = oc.id_crianca
-        WHERE c.id_crianca = {id_crianca}
+        WHERE c.id_crianca = %s
         GROUP BY ob.codigo, ob.tipo
-    '''
+        ''',
+        (id_crianca,)
+    )
 
 def avg_child_items(option):
-    return f'''
+    return (
+        '''
         SELECT c.codigo AS codigo_crianca, ie.descricao AS item, avg(r.valor_numerico) AS media_valor, fe.nome_fase AS fase
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
@@ -37,12 +44,15 @@ def avg_child_items(option):
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
-        WHERE c.codigo = "{option}" AND ie.tipo_resposta = "ESCALA_0_4" AND ob.tipo = "PROFESSOR"
+        WHERE c.codigo = %s AND ie.tipo_resposta = "ESCALA_0_4" AND ob.tipo = "PROFESSOR"
         GROUP BY codigo_crianca, item, nome_fase
-    '''
+        ''',
+        (option,)
+    )
 
 def avg_sleep_by_parents(option):
-    return f'''
+    return (
+        '''
         SELECT c.codigo AS codigo_crianca, avg(
             CASE oc.descricao
                 WHEN "menos de 4h" THEN 2
@@ -59,24 +69,30 @@ def avg_sleep_by_parents(option):
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
-        WHERE ob.tipo = "RESPONSAVEL" AND c.codigo = "{option}" AND ie.tipo_resposta = "SONO"
+        WHERE ob.tipo = "RESPONSAVEL" AND c.codigo = %s AND ie.tipo_resposta = "SONO"
         GROUP BY codigo_crianca, tipo_observador, fase
-    '''
+        ''',
+        (option,)
+    )
 
 def yes_no_frequency(option):
-    return f'''
+    return (
+        '''
         SELECT c.codigo AS codigo_crianca, ie.descricao AS descricao, fe.nome_fase AS fase, count(*) AS frequencia
         FROM Resposta r
         INNER JOIN Item_Escala ie ON ie.id_item = r.id_item
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
         INNER JOIN Crianca c ON c.id_crianca = re.id_crianca
-        WHERE ie.tipo_resposta = "SIM_NAO" AND r.id_opcao IN (11) AND c.codigo = "{option}"
+        WHERE ie.tipo_resposta = "SIM_NAO" AND r.id_opcao IN (11) AND c.codigo = %s
         GROUP BY codigo_crianca, descricao, fase
-    '''
+        ''',
+        (option,)
+    )
 
 def comportamental_diference(option, fase):
-    return f'''
+    return (
+        '''
         SELECT re.data AS data,
             MAX(CASE WHEN r.id_item = 22 THEN oc.descricao END) AS foi_para_escola,
             MAX(CASE WHEN r.id_item = 23 THEN oc.descricao END) AS voltou_da_escola
@@ -85,13 +101,16 @@ def comportamental_diference(option, fase):
         INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN Crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN Fase_Estudo fe ON fe.id_fase = re.id_fase
-        WHERE r.id_item IN (22, 23) AND c.codigo = "{option}" AND fe.nome_fase = "{fase}"
+        WHERE r.id_item IN (22, 23) AND c.codigo = %s AND fe.nome_fase = %s
         GROUP BY re.data
         ORDER BY re.data
-    '''
+        ''',
+        (option, fase)
+    )
 
 def avg_shift(fase):
-    return f'''
+    return (
+        '''
         SELECT fe.nome_fase AS fase, c.turno AS turno, c.regular AS regular, avg(r.valor_numerico) AS media_respostas
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
@@ -99,12 +118,15 @@ def avg_shift(fase):
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
-        WHERE ob.tipo = "PROFESSOR" AND fe.nome_fase = "{fase}" AND ie.tipo_resposta = "ESCALA_0_4"
+        WHERE ob.tipo = "PROFESSOR" AND fe.nome_fase = %s AND ie.tipo_resposta = "ESCALA_0_4"
         GROUP BY fase, regular, turno
-    '''
+        ''',
+        (fase,)
+    )
 
 def avg_child_items_by_domains(option, fase):
-    return f'''
+    return (
+        '''
         SELECT c.codigo AS codigo_crianca, de.nome AS nome_dominio, avg(r.valor_numerico) AS media_valor, fe.nome_fase AS fase
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
@@ -112,9 +134,11 @@ def avg_child_items_by_domains(option, fase):
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN dominio_escala de ON de.id_dominio = ie.id_dominio
-        WHERE c.codigo = "{option}" AND fe.nome_fase = "{fase}"
+        WHERE c.codigo = %s AND fe.nome_fase = %s
         GROUP BY codigo_crianca, nome_dominio
-    '''
+        ''',
+        (option, fase)
+    )
 
 def avg_domains_by_oil():
     return '''
@@ -215,7 +239,8 @@ def sleep_baseline_vs_intervention():
     '''
 
 def avg_by_environment(fase):
-    return f'''
+    return (
+        '''
         SELECT
             CASE WHEN ob.tipo = "PROFESSOR" THEN "Escolar" ELSE "Domiciliar" END AS ambiente,
             de.nome AS dominio,
@@ -226,12 +251,15 @@ def avg_by_environment(fase):
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
-        WHERE ie.tipo_resposta = "ESCALA_0_4" AND fe.nome_fase = "{fase}"
+        WHERE ie.tipo_resposta = "ESCALA_0_4" AND fe.nome_fase = %s
         GROUP BY ambiente, dominio
-    '''
+        ''',
+        (fase,)
+    )
 
 def sleep_by_environment(fase):
-    return f'''
+    return (
+        '''
         SELECT
             CASE WHEN ob.tipo = "PROFESSOR" THEN "Escolar" ELSE "Domiciliar" END AS ambiente,
             avg(r.valor_numerico) AS media_sono
@@ -240,12 +268,15 @@ def sleep_by_environment(fase):
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
-        WHERE ie.tipo_resposta = "SONO" AND fe.nome_fase = "{fase}"
+        WHERE ie.tipo_resposta = "SONO" AND fe.nome_fase = %s
         GROUP BY ambiente
-    '''
+        ''',
+        (fase,)
+    )
 
 def avg_sleep_by_parents_by_fase(fase):
-    return f'''
+    return (
+        '''
         SELECT avg(
             CASE oc.descricao
                 WHEN "menos de 4h" THEN 2
@@ -261,12 +292,15 @@ def avg_sleep_by_parents_by_fase(fase):
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
-        WHERE ie.tipo_resposta = "SONO" AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = "{fase}"
+        WHERE ie.tipo_resposta = "SONO" AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = %s
         GROUP BY fase
-    '''
+        ''',
+        (fase,)
+    )
 
 def yes_no_frequency_by_fase(fase):
-    return f'''
+    return (
+        '''
         SELECT ie.descricao AS descricao, count(*) AS frequencia
         FROM Resposta r
         INNER JOIN Item_Escala ie ON r.id_item = ie.id_item
@@ -274,9 +308,11 @@ def yes_no_frequency_by_fase(fase):
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
         WHERE ie.tipo_resposta = "SIM_NAO" AND r.id_opcao = 11
-            AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = "{fase}"
+            AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = %s
         GROUP BY descricao
-    '''
+        ''',
+        (fase,)
+    )
 
 def adhesion_by_responsible():
     return '''
@@ -290,16 +326,19 @@ def adhesion_by_responsible():
     '''
 
 def feeling_by_fase(fase):
-    return f'''
+    return (
+        '''
         SELECT oc.descricao AS sentimento, count(*) AS frequencia
         FROM Resposta r
         INNER JOIN Opcao_Categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN Registro re ON r.id_registro = re.id_registro
         INNER JOIN Observador ob ON re.id_observador = ob.id_observador
         INNER JOIN Fase_Estudo fe ON re.id_fase = fe.id_fase
-        WHERE r.id_item = 24 AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = "{fase}"
+        WHERE r.id_item = 24 AND ob.tipo = "RESPONSAVEL" AND fe.nome_fase = %s
         GROUP BY sentimento
-    '''
+        ''',
+        (fase,)
+    )
 
 def feeling_evolution():
     return '''

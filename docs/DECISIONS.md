@@ -113,3 +113,11 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 **Decisão**: O dashboard utiliza `streamlit-authenticator` com login único, sem RBAC. Todos os usuários autenticados têm acesso às mesmas páginas.
 
 **Motivo**: O sistema é destinado exclusivamente a pesquisadores com perfil de consulta. Não há necessidade de controle granular de acesso. As credenciais são armazenadas em `.streamlit/secrets.toml` com senhas em hash bcrypt.
+
+---
+
+## DEC16 — Auditoria de acesso via flag no session_state
+
+**Decisão**: O registro de LOGOUT na tabela `Auditoria` é feito detectando a chave `logout: true` no `session_state`, combinada com uma flag `_logout_registered` para evitar duplicatas.
+
+**Motivo**: O `streamlit-authenticator` limpa `username` do `session_state` antes do rerun causado pelo logout, tornando impossível capturar o usuário após o evento. A solução salva o username em `_current_user` a cada render autenticado e detecta o logout pela chave interna `logout` do authenticator. A flag `_logout_registered` é resetada apenas quando `logout` não está ativo, evitando registro duplicado no rerun seguinte ao login.

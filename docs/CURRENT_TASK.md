@@ -27,6 +27,9 @@
 - Autenticação com `streamlit-authenticator` implementada no dashboard
 - Credenciais armazenadas em `.streamlit/secrets.toml` (não versionado)
 - Navegação e páginas protegidas por login
+- Rate limiting: bloqueio após 5 tentativas de login falhas
+- Proteção contra SQL Injection via queries parametrizadas
+- Auditoria de acesso: registro de LOGIN, LOGIN_FALHA e LOGOUT na tabela `Auditoria`
 
 #### Dashboard — Visão Geral (`general.py`)
 - Métricas: total de crianças, responsáveis e professores
