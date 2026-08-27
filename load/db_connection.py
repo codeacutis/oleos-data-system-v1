@@ -1,22 +1,17 @@
 import mysql.connector
+import os
 
 def get_connection():
-    try: 
+    try:
         mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="db_oleos"
+            host=os.environ.get("DB_HOST", "localhost"),
+            port=int(os.environ.get("DB_PORT", 3306)),
+            user=os.environ.get("DB_USER", "root"),
+            password=os.environ.get("DB_PASSWORD", "root"),
+            database=os.environ.get("DB_NAME", "db_oleos")
         )
-
-        if mydb.is_connected():
-            cursor = mydb.cursor()
-            cursor.execute("SELECT DATABASE();")
-            linha = cursor.fetchone()
-            print("Conectado ao banco de dados:", linha[0])
-            return mydb 
-        
+        return mydb
     except mysql.connector.Error as erro:
-        print("Error to connect with DB", erro)
+        print("Erro ao conectar com o banco:", erro)
         return None
 
