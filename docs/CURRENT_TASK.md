@@ -68,22 +68,25 @@
 ### 🔄 Em Andamento
 
 #### Infraestrutura
-- Deploy da aplicação
-- Mecanismo de backup
+- Banco MySQL migrado para nuvem (Railway)
+- Deploy realizado no Streamlit Community Cloud
+- Conexão com banco via `st.secrets` (sem variáveis de ambiente)
+- `plotly` adicionado ao `requirements.txt`
 
 ---
 
 ## Próximo Passo
 
-Fase 3 — Deploy:
-- Migrar banco MySQL para nuvem (Railway ou AWS RDS)
-- Deploy no Streamlit Community Cloud
+Fase 3 — Finalizar deploy:
 - Configurar GitHub Actions para ETL diário
+- Mecanismo de backup
 
 ---
 
 ## Arquivos Ativos
 
-- `view/main.py` — autenticação implementada
-- `view/queries.py` — queries de sono corrigidas, dados sensíveis removidos
-- `view/sections/` — páginas com condicionais de dados vazios e labels padronizados
+- `view/main.py` — autenticação e auditoria implementadas
+- `view/db.py` — conexão via `st.secrets`
+- `view/queries.py` — queries padronizadas para minúsculo
+- `load/db_connection.py` — conexão via variáveis de ambiente (ETL local)
+- `requirements.txt` — plotly adicionado

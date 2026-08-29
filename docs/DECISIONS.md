@@ -116,7 +116,11 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 
 ---
 
-## DEC16 — Auditoria de acesso via flag no session_state
+## DEC17 — Conexão com banco via st.secrets no dashboard
+
+**Decisão**: O `view/db.py` conecta diretamente ao banco usando `st.secrets`, sem passar por variáveis de ambiente ou pelo `db_connection.py`.
+
+**Motivo**: No Streamlit Community Cloud, injetar as credenciais em variáveis de ambiente antes do `@st.cache_resource` causava fallback para `localhost`. A conexão direta via `st.secrets` dentro da função cacheada garante que as credenciais do Railway sejam usadas corretamente tanto em ambiente local quanto em produção.
 
 **Decisão**: O registro de LOGOUT na tabela `Auditoria` é feito detectando a chave `logout: true` no `session_state`, combinada com uma flag `_logout_registered` para evitar duplicatas.
 

@@ -24,8 +24,8 @@
 - [x] Rate limiting (bloqueio após 5 tentativas falhas)
 - [x] Proteção contra SQL Injection (queries parametrizadas)
 - [x] Auditoria de acesso (LOGIN, LOGIN_FALHA, LOGOUT)
-- [ ] Migrar banco MySQL para nuvem
-- [ ] Deploy no Streamlit Community Cloud
+- [x] Migrar banco MySQL para nuvem (Railway)
+- [x] Deploy no Streamlit Community Cloud
 - [ ] Configurar GitHub Actions para ETL diário
 - [ ] Mecanismo de backup
 
