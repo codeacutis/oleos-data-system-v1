@@ -1,18 +1,17 @@
 import view.config as config
 import pandas as pd
 import streamlit as st
-import os
-from load.db_connection import get_connection
-
-os.environ["DB_HOST"] = st.secrets["database"]["host"]
-os.environ["DB_PORT"] = str(st.secrets["database"]["port"])
-os.environ["DB_USER"] = st.secrets["database"]["user"]
-os.environ["DB_PASSWORD"] = st.secrets["database"]["password"]
-os.environ["DB_NAME"] = st.secrets["database"]["database"]
+import mysql.connector
 
 @st.cache_resource
 def connection():
-    return get_connection()
+    return mysql.connector.connect(
+        host=st.secrets["database"]["host"],
+        port=int(st.secrets["database"]["port"]),
+        user=st.secrets["database"]["user"],
+        password=st.secrets["database"]["password"],
+        database=st.secrets["database"]["database"]
+    )
 
 def query_execute(query, params=None):
     mydb = connection()
