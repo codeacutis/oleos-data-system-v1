@@ -3,7 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import config
 import streamlit as st
 import streamlit_authenticator as stauth
-from load.db_connection import get_connection
+import mysql.connector
 
 PAGES = [
     st.Page("sections/general.py", title="Visão Geral"),
@@ -30,10 +30,16 @@ MAX_LOGIN_ATTEMPTS = 5
 
 def audit_log(usuario, acao):
     try:
-        mydb = get_connection()
+        mydb = mysql.connector.connect(
+            host=st.secrets["database"]["host"],
+            port=int(st.secrets["database"]["port"]),
+            user=st.secrets["database"]["user"],
+            password=st.secrets["database"]["password"],
+            database=st.secrets["database"]["database"]
+        )
         cursor = mydb.cursor()
         cursor.execute(
-            "INSERT INTO Auditoria (usuario, acao) VALUES (%s, %s)",
+            "INSERT INTO auditoria (usuario, acao) VALUES (%s, %s)",
             (usuario, acao)
         )
         mydb.commit()

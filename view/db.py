@@ -1,10 +1,8 @@
-import view.config as config
+import mysql.connector
 import pandas as pd
 import streamlit as st
-import mysql.connector
 
-@st.cache_resource
-def connection():
+def get_connection():
     return mysql.connector.connect(
         host=st.secrets["database"]["host"],
         port=int(st.secrets["database"]["port"]),
@@ -14,5 +12,8 @@ def connection():
     )
 
 def query_execute(query, params=None):
-    mydb = connection()
-    return pd.read_sql_query(query, mydb, params=params)
+    mydb = get_connection()
+    try:
+        return pd.read_sql_query(query, mydb, params=params)
+    finally:
+        mydb.close()
