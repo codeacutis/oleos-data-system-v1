@@ -11,7 +11,7 @@ def get_connection():
         database=st.secrets["database"]["database"]
     )
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=300, show_spinner=False)
 def query_execute(query, params=None):
     mydb = get_connection()
     try:
