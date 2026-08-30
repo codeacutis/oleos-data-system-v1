@@ -4,6 +4,14 @@ import config
 import streamlit as st
 import streamlit_authenticator as stauth
 import mysql.connector
+from view.db import query_execute
+from view.queries import queries as q, avg_domains_by_oil, avg_sleep_by_oil, yes_no_frequency_by_oil, comportamental_by_oil, avg_baseline_vs_intervention, sleep_baseline_vs_intervention, adhesion_by_responsible, feeling_evolution, oil_resistance_by_fase, routine_change_by_fase
+
+def preload_data():
+    for query in q.values():
+        query_execute(query)
+    for fn in [avg_domains_by_oil, avg_sleep_by_oil, yes_no_frequency_by_oil, comportamental_by_oil, avg_baseline_vs_intervention, sleep_baseline_vs_intervention, adhesion_by_responsible, feeling_evolution, oil_resistance_by_fase, routine_change_by_fase]:
+        query_execute(fn())
 
 PAGES = [
     st.Page("sections/general.py", title="Visão Geral"),
@@ -78,6 +86,7 @@ if not st.session_state.get("authentication_status"):
     st.stop()
 
 with st.sidebar:
+    preload_data()
     st.write(f"Olá, {st.session_state['name']}")
     st.session_state["_current_user"] = st.session_state.get("username")
     if not st.session_state.get("logout"):
