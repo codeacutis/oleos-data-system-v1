@@ -34,11 +34,19 @@ def transform_teacher_data(form):
         value_name="resposta"
     ).reset_index(drop=True)
     
+    OPCOES_CHECKBOX = [
+        "o aluno faltou algum dia",
+        "houve alteração na rotina (evento, passeio, prova, etc.)",
+        "houve alguma intercorrência comportamental relevante"
+    ]
+
     df_checkbox = df[colunas_metadados + colunas_checkbox].copy()
-    df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.split(",")
     df_checkbox = df_checkbox.explode(colunas_checkbox[0])
-    df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.strip()
-    df_checkbox = df_checkbox[df_checkbox[colunas_checkbox[0]] != ""].reset_index(drop=True)
+    df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].apply(
+        lambda cell: [op for op in OPCOES_CHECKBOX if op in (cell or "").lower()]
+    )
+    df_checkbox = df_checkbox.explode(colunas_checkbox[0])
+    df_checkbox = df_checkbox[df_checkbox[colunas_checkbox[0]].notna() & (df_checkbox[colunas_checkbox[0]] != "")].reset_index(drop=True)
     
     df_texto = df[colunas_metadados + colunas_texto].reset_index(drop=True)
     

@@ -140,6 +140,8 @@ def load_parents_data(df_registro, df_resposta):
             (df_registro["data"] == df_resposta["carimbo_de_data/hora"][i]) &
             (df_registro["dia_avaliacao"] == df_resposta["dia_de_avaliação"][i])].index[0]
         resposta = df_resposta["resposta"][i]
+        if not resposta or not resposta.strip():
+            continue
         id_opcao_result = get_id_opcao(mycursor, resposta)
         id_opcao = id_opcao_result if id_opcao_result else None
         valor_texto = resposta if id_opcao is None else None
