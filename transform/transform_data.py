@@ -18,6 +18,8 @@ def transform_teacher_data(form):
     colunas_texto = ["descreva_sua_observação:"]
     colunas_escala = [i for i in df.columns if i not in colunas_metadados and i not in colunas_checkbox and i not in colunas_texto]
         
+    df["carimbo_de_data/hora"] = pd.to_datetime(df["carimbo_de_data/hora"], dayfirst=True).dt.date
+
     df_registro = df[colunas_metadados].assign(fase=form["fase"]).rename(columns={
         "carimbo_de_data/hora": "data",
         "qual_o_código_da_criança_que_está_sendo_observada?": "codigo"
