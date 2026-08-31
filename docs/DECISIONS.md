@@ -120,7 +120,23 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 
 **Decisão**: O `view/db.py` conecta diretamente ao banco usando `st.secrets`, sem passar por variáveis de ambiente ou pelo `db_connection.py`.
 
-**Motivo**: No Streamlit Community Cloud, injetar as credenciais em variáveis de ambiente antes do `@st.cache_resource` causava fallback para `localhost`. A conexão direta via `st.secrets` dentro da função cacheada garante que as credenciais do Railway sejam usadas corretamente tanto em ambiente local quanto em produção.
+**Motivo**: No Streamlit Community Cloud, injetar as credenciais em variáveis de ambiente antes do `@st.cache_resource` causava fallback para `localhost`. A conexão direta via `st.secrets` dentro da função garante que as credenciais do Railway sejam usadas corretamente tanto em ambiente local quanto em produção.
+
+---
+
+## DEC18 — Cache nos dados, não na conexão
+
+**Decisão**: O `@st.cache_data(ttl=3600)` é aplicado na função `query_execute`, e não na conexão com o banco.
+
+**Motivo**: Conexões MySQL têm tempo de vida limitado e podem ser encerradas pelo servidor por inatividade. Cachear a conexão com `@st.cache_resource` causava erros `MySQL Connection not available` após períodos de ociosidade. Cachear o resultado (um DataFrame) é mais seguro pois o dado não expira nem quebra. O TTL de 1 hora é adequado pois os dados só mudam quando o ETL roda.
+
+---
+
+## DEC19 — Pré-carregamento das queries estáticas após login
+
+**Decisão**: A função `preload_data` no `main.py` executa todas as queries estáticas logo após o usuário ser autenticado.
+
+**Motivo**: O Streamlit só executa o código de uma página quando o usuário a visita, causando demora na primeira visita de cada página. O pré-carregamento popula o cache compartilhado do `@st.cache_data` imediatamente após o login, tornando a navegação instantânea. Queries dinâmicas (parametrizadas por criança ou fase) não são pré-carregadas pois dependem da interação do usuário.
 
 **Decisão**: O registro de LOGOUT na tabela `Auditoria` é feito detectando a chave `logout: true` no `session_state`, combinada com uma flag `_logout_registered` para evitar duplicatas.
 

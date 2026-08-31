@@ -72,6 +72,8 @@
 - Deploy realizado no Streamlit Community Cloud
 - Conexão com banco via `st.secrets` (sem variáveis de ambiente)
 - `plotly` adicionado ao `requirements.txt`
+- Cache de dados com `@st.cache_data` (TTL de 1 hora) em vez de cache de conexão
+- Pré-carregamento das queries estáticas após login (`preload_data` no `main.py`)
 
 ---
 

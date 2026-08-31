@@ -6,4 +6,5 @@ retry
 streamlit
 streamlit-authenticator
 plotly
+pandas
 
