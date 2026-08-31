@@ -30,8 +30,7 @@ jobs:
       - name: Create Google credentials files
         run: |
           echo '${{ secrets.CONFIG_YAML }}' > config.yaml
-          echo '${{ secrets.CLIENT_SECRET_JSON }}' > auth/client_secret.json
-          echo '${{ secrets.TOKEN_JSON }}' > auth/token.json
+          echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > auth/service_account.json
 
       - name: Run Data Pipeline
         run: python app.py

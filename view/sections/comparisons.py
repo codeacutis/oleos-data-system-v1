@@ -43,6 +43,7 @@ with st.container(key="comparacao_geral"):
         child2 = st.selectbox(
             'Selecione uma criança:',
             query_execute(q.get("codigos_criancas")),
+            index=1,
             key="select_child2"
             )
     with col_center:

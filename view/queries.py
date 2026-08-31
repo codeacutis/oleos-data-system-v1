@@ -63,7 +63,7 @@ def avg_sleep_by_parents(option):
             END
         ) AS media_valor, ob.tipo AS tipo_observador, fe.nome_fase AS fase
         FROM resposta r
-        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
+        LEFT JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
@@ -94,11 +94,11 @@ def comportamental_diference(option, fase):
     return (
         '''
         SELECT re.data AS data,
-            MAX(CASE WHEN r.id_item = 22 THEN oc.descricao END) AS foi_para_escola,
-            MAX(CASE WHEN r.id_item = 23 THEN oc.descricao END) AS voltou_da_escola
+            MAX(CASE WHEN r.id_item = 22 THEN COALESCE(oc.descricao, r.valor_texto) END) AS foi_para_escola,
+            MAX(CASE WHEN r.id_item = 23 THEN COALESCE(oc.descricao, r.valor_texto) END) AS voltou_da_escola
         FROM resposta r
         INNER JOIN registro re ON r.id_registro = re.id_registro
-        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
+        LEFT JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN crianca c ON c.id_crianca = re.id_crianca
         INNER JOIN fase_estudo fe ON fe.id_fase = re.id_fase
         WHERE r.id_item IN (22, 23) AND c.codigo = %s AND fe.nome_fase = %s
@@ -165,7 +165,7 @@ def avg_sleep_by_oil():
             END
         ) AS media_sono
         FROM resposta r
-        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
+        LEFT JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
@@ -229,7 +229,7 @@ def sleep_baseline_vs_intervention():
                 END
             ) AS media_sono
         FROM resposta r
-        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
+        LEFT JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
@@ -287,7 +287,7 @@ def avg_sleep_by_parents_by_fase(fase):
             END
         ) AS media_valor, fe.nome_fase AS fase
         FROM resposta r
-        INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
+        LEFT JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
@@ -360,7 +360,6 @@ def oil_resistance_by_fase():
         INNER JOIN registro re ON r.id_registro = re.id_registro
         INNER JOIN observador ob ON re.id_observador = ob.id_observador
         INNER JOIN fase_estudo fe ON re.id_fase = fe.id_fase
-        INNER JOIN oleo o ON fe.id_oleo = o.id_oleo
         WHERE r.id_item = 25 AND r.id_opcao = 11 AND ob.tipo = "RESPONSAVEL"
         GROUP BY fase, ordem
         ORDER BY ordem

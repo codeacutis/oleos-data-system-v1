@@ -8,4 +8,5 @@ streamlit
 streamlit-authenticator
 plotly
 pandas
+python-dotenv
 

@@ -60,10 +60,12 @@ def get_id_opcao_checkbox(cursor, descricao):
 
 def load_teacher_data(df_registro, df_resposta, df_checkbox, df_texto):
     mydb = get_connection()
+    if mydb is None:
+        raise RuntimeError("Falha ao conectar com o banco de dados em load_teacher_data")
     mycursor = mydb.cursor()
 
     insert_query_registro = "INSERT IGNORE INTO registro (data, id_crianca, id_observador, id_fase, id_formulario) VALUES (%s, %s, %s, %s, %s)"
-    ids_registro = []
+    idx_to_id = {}
 
     for i in range(len(df_registro)):
         data = _to_date(df_registro["data"][i])
@@ -71,51 +73,73 @@ def load_teacher_data(df_registro, df_resposta, df_checkbox, df_texto):
         id_observer = get_id_observer(mycursor, id_crianca, 'PROFESSOR')
         id_fase = get_id_fase(mycursor, df_registro['fase'][i])
         id_form = get_id_form(mycursor, 'PROFESSOR', id_fase)
-        value = (data, id_crianca, id_observer, id_fase, id_form)
-        mycursor.execute(insert_query_registro, value)
+        mycursor.execute(insert_query_registro, (data, id_crianca, id_observer, id_fase, id_form))
 
         if mycursor.lastrowid != 0:
-            ids_registro.append(mycursor.lastrowid)
+            idx_to_id[i] = mycursor.lastrowid
         else:
             mycursor.execute("SELECT id_registro FROM registro WHERE data = %s AND id_crianca = %s AND id_formulario = %s",
                             (data, id_crianca, id_form))
-            ids_registro.append(mycursor.fetchone()[0])
+            result = mycursor.fetchone()
+            idx_to_id[i] = result[0] if result else None
+
+    inserted = len(idx_to_id)
 
     insert_query_resposta = "INSERT IGNORE INTO resposta (id_registro, id_item, valor_numerico, id_opcao, valor_texto) VALUES (%s, %s, %s, %s, %s)"
     for i in range(len(df_resposta)):
-        idx = df_registro[
+        match = df_registro[
             (df_registro["codigo"] == df_resposta["qual_o_código_da_criança_que_está_sendo_observada?"][i]) &
-            (df_registro["data"] == df_resposta["carimbo_de_data/hora"][i])].index[0]
-        value = (ids_registro[idx], get_id_item(mycursor, df_resposta["pergunta"][i]), df_resposta["resposta"][i], None, None)
-        mycursor.execute(insert_query_resposta, value)
+            (df_registro["data"] == df_resposta["carimbo_de_data/hora"][i])]
+        if match.empty:
+            continue
+        idx = match.index[0]
+        id_registro = idx_to_id.get(idx)
+        if id_registro is None:
+            continue
+        mycursor.execute(insert_query_resposta, (id_registro, get_id_item(mycursor, df_resposta["pergunta"][i]), df_resposta["resposta"][i], None, None))
+        inserted += mycursor.rowcount
 
     insert_query_resposta_checkbox = "INSERT IGNORE INTO resposta_checkbox (id_registro, id_item, id_opcao_checkbox) VALUES (%s, %s, %s)"
     for i in range(len(df_checkbox)):
-        idx = df_registro[
+        match = df_registro[
             (df_registro["codigo"] == df_checkbox["qual_o_código_da_criança_que_está_sendo_observada?"][i]) &
-            (df_registro["data"] == df_checkbox["carimbo_de_data/hora"][i])].index[0]
-        value = (ids_registro[idx], get_id_item(mycursor, "nesta_semana:"), get_id_opcao_checkbox(mycursor, df_checkbox["nesta_semana:"][i]))
-        mycursor.execute(insert_query_resposta_checkbox, value)
+            (df_registro["data"] == df_checkbox["carimbo_de_data/hora"][i])]
+        if match.empty:
+            continue
+        idx = match.index[0]
+        id_registro = idx_to_id.get(idx)
+        if id_registro is None:
+            continue
+        mycursor.execute(insert_query_resposta_checkbox, (id_registro, get_id_item(mycursor, "nesta_semana:"), get_id_opcao_checkbox(mycursor, df_checkbox["nesta_semana:"][i])))
+        inserted += mycursor.rowcount
 
     for i in range(len(df_texto)):
-        idx = df_registro[
+        match = df_registro[
             (df_registro["codigo"] == df_texto["qual_o_código_da_criança_que_está_sendo_observada?"][i]) &
-            (df_registro["data"] == df_texto["carimbo_de_data/hora"][i])].index[0]
-        value = (ids_registro[idx], get_id_item(mycursor, "descreva_sua_observação:"), None, None, df_texto["descreva_sua_observação:"][i])
-        mycursor.execute(insert_query_resposta, value)
+            (df_registro["data"] == df_texto["carimbo_de_data/hora"][i])]
+        if match.empty:
+            continue
+        idx = match.index[0]
+        id_registro = idx_to_id.get(idx)
+        if id_registro is None:
+            continue
+        mycursor.execute(insert_query_resposta, (id_registro, get_id_item(mycursor, "descreva_sua_observação:"), None, None, df_texto["descreva_sua_observação:"][i]))
+        inserted += mycursor.rowcount
 
     mydb.commit()
-    print(mycursor.rowcount, "was inserted.")
+    print(inserted, "rows inserted.")
     mycursor.close()
     mydb.close()
 
 
 def load_parents_data(df_registro, df_resposta):
     mydb = get_connection()
+    if mydb is None:
+        raise RuntimeError("Falha ao conectar com o banco de dados em load_parents_data")
     mycursor = mydb.cursor()
 
     insert_query_registro = "INSERT IGNORE INTO registro (data, id_crianca, id_observador, id_fase, id_formulario) VALUES (%s, %s, %s, %s, %s)"
-    ids_registro = []
+    idx_to_id = {}
 
     for i in range(len(df_registro)):
         data = _to_date(df_registro["data"][i])
@@ -123,32 +147,40 @@ def load_parents_data(df_registro, df_resposta):
         id_observer = get_id_observer(mycursor, id_crianca, 'RESPONSAVEL')
         id_fase = get_id_fase(mycursor, df_registro['fase'][i])
         id_form = get_id_form(mycursor, 'PAIS', id_fase)
-        value = (data, id_crianca, id_observer, id_fase, id_form)
-        mycursor.execute(insert_query_registro, value)
+        mycursor.execute(insert_query_registro, (data, id_crianca, id_observer, id_fase, id_form))
 
         if mycursor.lastrowid != 0:
-            ids_registro.append(mycursor.lastrowid)
+            idx_to_id[i] = mycursor.lastrowid
         else:
             mycursor.execute("SELECT id_registro FROM registro WHERE data = %s AND id_crianca = %s AND id_formulario = %s",
                             (data, id_crianca, id_form))
-            ids_registro.append(mycursor.fetchone()[0])
+            result = mycursor.fetchone()
+            idx_to_id[i] = result[0] if result else None
+
+    inserted = len(idx_to_id)
 
     insert_query_resposta = "INSERT IGNORE INTO resposta (id_registro, id_item, valor_numerico, id_opcao, valor_texto) VALUES (%s, %s, %s, %s, %s)"
     for i in range(len(df_resposta)):
-        idx = df_registro[
+        match = df_registro[
             (df_registro["codigo"] == df_resposta["qual_o_código_da_criança_que_está_sendo_observada?"][i]) &
             (df_registro["data"] == df_resposta["carimbo_de_data/hora"][i]) &
-            (df_registro["dia_avaliacao"] == df_resposta["dia_de_avaliação"][i])].index[0]
+            (df_registro["dia_avaliacao"] == df_resposta["dia_de_avaliação"][i])]
+        if match.empty:
+            continue
+        idx = match.index[0]
+        id_registro = idx_to_id.get(idx)
+        if id_registro is None:
+            continue
         resposta = df_resposta["resposta"][i]
         if not resposta or not resposta.strip():
             continue
         id_opcao_result = get_id_opcao(mycursor, resposta)
         id_opcao = id_opcao_result if id_opcao_result else None
         valor_texto = resposta if id_opcao is None else None
-        value = (ids_registro[idx], get_id_item(mycursor, df_resposta["pergunta"][i]), None, id_opcao, valor_texto)
-        mycursor.execute(insert_query_resposta, value)
+        mycursor.execute(insert_query_resposta, (id_registro, get_id_item(mycursor, df_resposta["pergunta"][i]), None, id_opcao, valor_texto))
+        inserted += mycursor.rowcount
 
     mydb.commit()
-    print(mycursor.rowcount, "was inserted.")
+    print(inserted, "rows inserted.")
     mycursor.close()
     mydb.close()

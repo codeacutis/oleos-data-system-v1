@@ -11,6 +11,7 @@ from load.database_loader import (load_parents_data, load_teacher_data)
 extract = extractor_all_sheets()
 
 for i in extract:
+    print(f"Processando: {i['name']} | tipo: {i['type']} | fase: {i['fase']} | registros: {len(i['value']) - 1 if i['value'] else 0}")
     if i['type'] == 'PROFESSOR':
         df_registro, df_resposta, df_checkbox, df_texto = transform_teacher_data(i)
         load_teacher_data(df_registro, df_resposta, df_checkbox, df_texto)

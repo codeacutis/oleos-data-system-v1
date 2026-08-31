@@ -1,10 +1,12 @@
 # Credenciais e tokens
 auth/client_secret.json
 auth/token.json
+auth/service_account.json
 
 # Configurações sensíveis
 config.yaml
 auth.yaml
+.env
 
 # Ambiente virtual
 venv/
