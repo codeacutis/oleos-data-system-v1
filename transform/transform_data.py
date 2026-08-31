@@ -24,23 +24,18 @@ def transform_teacher_data(form):
     df_registro = df[colunas_metadados].assign(fase=form["fase"]).rename(columns={
         "carimbo_de_data/hora": "data",
         "qual_o_código_da_criança_que_está_sendo_observada?": "codigo"
-    })
-    
-    df_resposta = pd.melt(
-        df,
-        id_vars=colunas_metadados,
-        value_vars=colunas_escala,
+    }).reset_index(drop=True)
         var_name="pergunta",
         value_name="resposta"
-    )
+    ).reset_index(drop=True)
     
     df_checkbox = df[colunas_metadados + colunas_checkbox].copy()
     df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.split(",")
     df_checkbox = df_checkbox.explode(colunas_checkbox[0])
     df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.strip()
-    df_checkbox = df_checkbox[df_checkbox[colunas_checkbox[0]] != ""]
+    df_checkbox = df_checkbox[df_checkbox[colunas_checkbox[0]] != ""].reset_index(drop=True)
     
-    df_texto = df[colunas_metadados + colunas_texto]
+    df_texto = df[colunas_metadados + colunas_texto].reset_index(drop=True)
     
     return df_registro, df_resposta, df_checkbox, df_texto
 
@@ -74,7 +69,7 @@ def transform_parents_data(form):
         "carimbo_de_data/hora":"data",
         "qual_o_código_da_criança_que_está_sendo_observada?": "codigo",
         "dia_de_avaliação":"dia_avaliacao"
-    })
+    }).reset_index(drop=True)
     
     df_resposta = pd.melt(
         df,
@@ -82,7 +77,7 @@ def transform_parents_data(form):
         value_vars=colunas_resposta,
         var_name="pergunta",
         value_name="resposta"
-    )
+    ).reset_index(drop=True)
     
     return df_registro, df_resposta
 
