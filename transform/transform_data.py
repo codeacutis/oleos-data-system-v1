@@ -37,6 +37,8 @@ def transform_teacher_data(form):
     df_checkbox = df[colunas_metadados + colunas_checkbox].copy()
     df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.split(",")
     df_checkbox = df_checkbox.explode(colunas_checkbox[0])
+    df_checkbox[colunas_checkbox[0]] = df_checkbox[colunas_checkbox[0]].str.strip()
+    df_checkbox = df_checkbox[df_checkbox[colunas_checkbox[0]] != ""]
     
     df_texto = df[colunas_metadados + colunas_texto]
     
