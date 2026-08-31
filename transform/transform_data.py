@@ -25,6 +25,11 @@ def transform_teacher_data(form):
         "carimbo_de_data/hora": "data",
         "qual_o_código_da_criança_que_está_sendo_observada?": "codigo"
     }).reset_index(drop=True)
+    
+    df_resposta = pd.melt(
+        df,
+        id_vars=colunas_metadados,
+        value_vars=colunas_escala,
         var_name="pergunta",
         value_name="resposta"
     ).reset_index(drop=True)
