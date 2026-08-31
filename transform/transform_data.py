@@ -10,7 +10,8 @@ def transform_teacher_data(form):
         df.columns
         .str.strip()
         .str.lower()
-        .str.replace(" ", "_")
+        .str.split()
+        .str.join("_")
     )
     
     colunas_metadados = ["carimbo_de_data/hora", "qual_o_código_da_criança_que_está_sendo_observada?"]
@@ -50,7 +51,8 @@ def transform_parents_data(form):
         df.columns
         .str.strip()
         .str.lower()
-        .str.replace(" ", "_")
+        .str.split()
+        .str.join("_")
     )
     df["carimbo_de_data/hora"] = pd.to_datetime(df["carimbo_de_data/hora"], dayfirst=True).dt.date
     

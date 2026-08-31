@@ -36,7 +36,7 @@ def get_id_observer(cursor, id_crianca, tipo):
     return result[0]
 
 def get_id_item(cursor, descricao):
-    descricao_normalizada = descricao.replace("_", " ")
+    descricao_normalizada = " ".join(descricao.replace("_", " ").split())
     cursor.execute("SELECT id_item FROM item_escala WHERE descricao = (%s)", (descricao_normalizada,))
     result = cursor.fetchone()
     if result is None:
