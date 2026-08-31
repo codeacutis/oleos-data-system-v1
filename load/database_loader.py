@@ -1,4 +1,11 @@
 from load.db_connection import get_connection
+from datetime import date
+import pandas as pd
+
+def _to_date(value):
+    if isinstance(value, date):
+        return value
+    return pd.to_datetime(value, dayfirst=True).date()
 
 def get_id_fase(cursor, nome_fase):
     cursor.execute("SELECT id_fase FROM fase_estudo WHERE nome_fase = (%s)", (nome_fase,))
@@ -59,18 +66,19 @@ def load_teacher_data(df_registro, df_resposta, df_checkbox, df_texto):
     ids_registro = []
 
     for i in range(len(df_registro)):
+        data = _to_date(df_registro["data"][i])
         id_crianca = get_id_child(mycursor, df_registro["codigo"][i])
         id_observer = get_id_observer(mycursor, id_crianca, 'PROFESSOR')
         id_fase = get_id_fase(mycursor, df_registro['fase'][i])
         id_form = get_id_form(mycursor, 'PROFESSOR', id_fase)
-        value = (df_registro["data"][i], id_crianca, id_observer, id_fase, id_form)
+        value = (data, id_crianca, id_observer, id_fase, id_form)
         mycursor.execute(insert_query_registro, value)
 
         if mycursor.lastrowid != 0:
             ids_registro.append(mycursor.lastrowid)
         else:
             mycursor.execute("SELECT id_registro FROM registro WHERE data = %s AND id_crianca = %s AND id_formulario = %s",
-                            (df_registro["data"][i], id_crianca, id_form))
+                            (data, id_crianca, id_form))
             ids_registro.append(mycursor.fetchone()[0])
 
     insert_query_resposta = "INSERT IGNORE INTO resposta (id_registro, id_item, valor_numerico, id_opcao, valor_texto) VALUES (%s, %s, %s, %s, %s)"
@@ -110,18 +118,19 @@ def load_parents_data(df_registro, df_resposta):
     ids_registro = []
 
     for i in range(len(df_registro)):
+        data = _to_date(df_registro["data"][i])
         id_crianca = get_id_child(mycursor, df_registro["codigo"][i])
         id_observer = get_id_observer(mycursor, id_crianca, 'RESPONSAVEL')
         id_fase = get_id_fase(mycursor, df_registro['fase'][i])
         id_form = get_id_form(mycursor, 'PAIS', id_fase)
-        value = (df_registro["data"][i], id_crianca, id_observer, id_fase, id_form)
+        value = (data, id_crianca, id_observer, id_fase, id_form)
         mycursor.execute(insert_query_registro, value)
 
         if mycursor.lastrowid != 0:
             ids_registro.append(mycursor.lastrowid)
         else:
             mycursor.execute("SELECT id_registro FROM registro WHERE data = %s AND id_crianca = %s AND id_formulario = %s",
-                            (df_registro["data"][i], id_crianca, id_form))
+                            (data, id_crianca, id_form))
             ids_registro.append(mycursor.fetchone()[0])
 
     insert_query_resposta = "INSERT IGNORE INTO resposta (id_registro, id_item, valor_numerico, id_opcao, valor_texto) VALUES (%s, %s, %s, %s, %s)"
