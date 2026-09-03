@@ -69,12 +69,13 @@ app.py
 * Python
 * Streamlit
 * Streamlit Authenticator
-* MySQL
-* Google Sheets API
+* MySQL (Railway)
+* Google Sheets API (Service Account)
 * Google Forms
 * Plotly
 * Pandas
 * YAML
+* GitHub Actions
 
 ---
 
@@ -124,15 +125,15 @@ app.py
 * Autenticação com `streamlit-authenticator` — login obrigatório para acesso ao dashboard
 * Senhas armazenadas com hash bcrypt
 * Credenciais em `.streamlit/secrets.toml` (não versionado)
+* Acesso ao Google Sheets via Service Account — sem OAuth interativo, sem token com expiração
+* Variáveis de ambiente para conexão ao banco (`.env` local, secrets no GitHub Actions)
 * Identificação de participantes por código (`CR001`, `OB001`) — nomes e diagnósticos não expostos
 
 ---
 
 ## Em desenvolvimento
 
-* Migração do banco MySQL para nuvem
 * Deploy no Streamlit Community Cloud
-* GitHub Actions para ETL diário
 * Mecanismo de backup
 
 ---
@@ -161,6 +162,18 @@ config.yaml.example
 
 Crie o arquivo `.streamlit/secrets.toml` com as credenciais de acesso ao dashboard e ao banco de dados.
 
+Crie o arquivo `auth/service_account.json` com as credenciais da Service Account do Google Cloud com acesso à Google Sheets API.
+
+Crie o arquivo `.env` na raiz do projeto com as variáveis de conexão ao banco de dados:
+
+```text
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+```
+
 ### 4. Execute o processo ETL
 
 ```bash
@@ -177,7 +190,7 @@ streamlit run view/main.py
 
 ## Status
 
-O pipeline ETL, as 4 páginas do dashboard e a autenticação estão concluídos. O projeto encontra-se na fase de deploy.
+O pipeline ETL, as 4 páginas do dashboard e a autenticação estão concluídos. O banco de dados está hospedado no Railway e o ETL roda automaticamente todo dia via GitHub Actions. O projeto encontra-se na fase de deploy do dashboard.
 
 ---
 

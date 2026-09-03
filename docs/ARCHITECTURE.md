@@ -27,9 +27,8 @@ Google Forms / Google Sheets
 ```
 etl-oleos/
 ├── auth/
-│   ├── google_auth.py        # Autenticação OAuth2 com Google
-│   ├── client_secret.json    # Credenciais OAuth (não versionado)
-│   └── token.json            # Token de acesso (não versionado)
+│   ├── google_auth.py        # Autenticação via Service Account com Google
+│   └── service_account.json  # Credenciais da Service Account (não versionado)
 │
 ├── extract/
 │   └── sheets_extractor.py   # Extração dos dados via Google Sheets API
@@ -47,6 +46,7 @@ etl-oleos/
 │   ├── config.py             # Configuração do sys.path
 │   ├── db.py                 # Conexão cacheada e execução de queries
 │   ├── queries.py            # Queries SQL estáticas e funções dinâmicas
+│   ├── colors.py             # Paleta semântica centralizada (constantes, dicionários, sequências)
 │   └── sections/
 │       ├── general.py        # Página: Visão Geral
 │       ├── children.py       # Página: Análise por Criança
@@ -68,7 +68,7 @@ etl-oleos/
 ## Módulos
 
 ### auth
-Responsável pela autenticação com a API do Google via OAuth2. Gera e renova o `token.json` automaticamente.
+Responsável pela autenticação com a API do Google via Service Account. Utiliza `service_account.json` para autenticação headless, sem necessidade de interação do usuário.
 
 ### extract
 Consome a Google Sheets API para extrair as respostas dos formulários. Utiliza `@retry` para lidar com falhas de rede (`HttpError`).
@@ -80,7 +80,7 @@ Recebe os dados brutos extraídos e os transforma para o formato esperado pelo b
 Contém as funções de persistência no banco MySQL. O `seed.py` popula os dados estáticos (crianças, observadores, fases, óleos, itens de escala). O `database_loader.py` contém as funções `get_*` e `load_*` para inserção dos registros.
 
 ### view
-Camada de visualização desenvolvida em Streamlit. Organizada em páginas independentes dentro de `sections/` (renomeada de `pages/` para evitar detecção automática pelo Streamlit). O `main.py` gerencia a autenticação com `streamlit-authenticator` antes de renderizar a navegação. O `db.py` utiliza `@st.cache_resource` para manter a conexão com o banco entre reruns.
+Camada de visualização desenvolvida em Streamlit. Organizada em páginas independentes dentro de `sections/` (renomeada de `pages/` para evitar detecção automática pelo Streamlit). O `main.py` gerencia a autenticação com `streamlit-authenticator` antes de renderizar a navegação. O `db.py` utiliza `@st.cache_resource` para manter a conexão com o banco entre reruns. O `colors.py` centraliza toda a paleta semântica do dashboard — constantes de cor, dicionários de mapeamento por categoria e sequências para gráficos.
 
 ---
 
@@ -115,10 +115,12 @@ Banco: `db_oleos` — MySQL
 ```bash
 python app.py
 ```
-1. Autentica com Google
+1. Autentica com Google via Service Account
 2. Extrai respostas de todos os formulários configurados no `config.yaml`
 3. Transforma os dados
-4. Carrega no banco MySQL
+4. Carrega no banco MySQL (Railway)
+
+O ETL também é executado automaticamente todo dia via GitHub Actions, com as credenciais injetadas como secrets.
 
 ### Dashboard
 ```bash

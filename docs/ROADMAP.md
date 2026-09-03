@@ -26,7 +26,7 @@
 - [x] Auditoria de acesso (LOGIN, LOGIN_FALHA, LOGOUT)
 - [x] Migrar banco MySQL para nuvem (Railway)
 - [x] Deploy no Streamlit Community Cloud
-- [ ] Configurar GitHub Actions para ETL diário
+- [x] Configurar GitHub Actions para ETL diário
 - [ ] Mecanismo de backup
 
 ---
@@ -39,8 +39,8 @@
 - [ ] Novos indicadores para os pesquisadores
 
 ### Infraestrutura
-- [ ] Automação do processo ETL (agendamento)
 - [ ] Monitoramento de erros em produção
+- [ ] Mecanismo de backup
 - [ ] Documentação técnica completa
 
 ---

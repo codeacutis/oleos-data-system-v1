@@ -9,6 +9,7 @@ import streamlit as st
 import plotly.express as px
 from datetime import date
 import pandas as pd
+from view.colors import FASES, AZUL, VERDE, VERMELHO, EVENTOS_ADVERSOS
 
 st.title("Análise por Criança", text_alignment='center')
 
@@ -53,6 +54,7 @@ with st.container(key="comparacao"):
         st.info("Nenhum registro encontrado.")
     else:
         fig = px.bar(query_item, x='item', y='media_valor', color="fase", barmode="group",
+                     color_discrete_map=FASES,
                      labels={'item': 'Item', 'media_valor': 'Média', 'fase': 'Fase'})
         st.plotly_chart(fig, key="grafico_linhaBaseXoleos")
     
@@ -66,6 +68,7 @@ with st.container(key="ambientes"):
         st.info("Nenhum registro encontrado.")
     else:
         fig2 = px.line(query_sleep, x='fase', y='media_valor',
+                       color_discrete_sequence=[AZUL],
                        labels={'fase': 'Fase', 'media_valor': 'Média de Sono (h)'})
         st.plotly_chart(fig2, key="grafico_sono")
     
@@ -74,8 +77,10 @@ with st.container(key="ambientes"):
     if query_adversities.empty:
         st.info("Nenhum registro encontrado.")
     else:
-        st.bar_chart(query_adversities, x='fase', y='frequencia', color="descricao", stack=False,
-                     x_label="Fase", y_label="Frequência")
+        fig_adv = px.bar(query_adversities, x='fase', y='frequencia', color='descricao',
+                         barmode='group', color_discrete_map=EVENTOS_ADVERSOS,
+                         labels={'fase': 'Fase', 'frequencia': 'Frequência', 'descricao': 'Evento'})
+        st.plotly_chart(fig_adv, key="grafico_eventos_adversos")
     
     st.subheader("Comportamento ao ir e voltar da escola")
     fase = st.selectbox("Fase", query_execute(q.get("nomes_fases")), key="select_fase_comportamental")

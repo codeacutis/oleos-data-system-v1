@@ -13,6 +13,9 @@ import streamlit as st
 import plotly.express as px
 from datetime import date
 import pandas as pd
+from view.colors import (FASES, PERIODOS, SENTIMENTOS, AMBIENTES, COMPORTAMENTO,
+                         SEQUENCIA_NEUTRA, SEQUENCIA_DOMINIOS, SEQUENCIA_OLEOS,
+                         VERDE, VERMELHO, AZUL, AMARELO, EVENTOS_ADVERSOS)
 
 st.title("Quadro de Comparações", text_alignment="center")
 
@@ -28,6 +31,7 @@ with st.container(key="comparacao_geral"):
         st.info("Nenhum registro encontrado.")
     else:
         fig = px.bar(query_shift, x='turno', y='media_respostas', color="regular", barmode="group",
+                     color_discrete_sequence=SEQUENCIA_NEUTRA,
                      labels={'turno': 'Turno', 'media_respostas': 'Média', 'regular': 'Regular'})
         st.plotly_chart(fig, key="grafico_comparacao_turnos_fase")
     
@@ -52,6 +56,7 @@ with st.container(key="comparacao_geral"):
             st.info("Nenhum registro encontrado.")
         else:
             fig = px.line_polar(dtframe, r='media_valor', theta='nome_dominio', color='codigo_crianca',
+                                color_discrete_sequence=[AZUL, AMARELO],
                                 labels={'media_valor': 'Média', 'nome_dominio': 'Domínio', 'codigo_crianca': 'Criança'})
             st.plotly_chart(fig, key="grafico_radar")
     
@@ -63,14 +68,15 @@ with st.container(key="scores_por_oleo"):
     if df_domains.empty:
         st.info("Nenhum registro encontrado.")
     else:
-        fig = px.bar(df_domains, x='oleo', y='media_valor', color='dominio', barmode='group',
+        fig = px.bar(df_domains, x='oleo', y='media_valor', color='dominio',
+                     color_discrete_sequence=SEQUENCIA_DOMINIOS,
                      labels={'oleo': 'Óleo', 'media_valor': 'Média', 'dominio': 'Domínio'})
         st.plotly_chart(fig, key="grafico_dominios_oleo")
 
 with st.container(key="dados_pais_oleo"):
     st.subheader("Dados dos Pais por Óleo")
     
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 2], gap="medium")
     
     with col1:
         st.write("**Média de Sono**")
@@ -78,18 +84,10 @@ with st.container(key="dados_pais_oleo"):
         if df_sleep.empty:
             st.info("Nenhum registro encontrado.")
         else:
-            fig2 = px.bar(df_sleep, x='oleo', y='media_sono',
+            fig2 = px.bar(df_sleep, x='oleo', y='media_sono', color='oleo',
+                          color_discrete_sequence=SEQUENCIA_OLEOS,
                           labels={'oleo': 'Óleo', 'media_sono': 'Média de Sono (h)'})
             st.plotly_chart(fig2, key="grafico_sono_oleo")
-        
-        st.write("**Eventos Adversos**")
-        df_yesno = query_execute(yes_no_frequency_by_oil())
-        if df_yesno.empty:
-            st.info("Nenhum registro encontrado.")
-        else:
-            fig3 = px.bar(df_yesno, x='oleo', y='frequencia', color='pergunta', barmode='group',
-                          labels={'oleo': 'Óleo', 'frequencia': 'Frequência', 'pergunta': 'Pergunta'})
-            st.plotly_chart(fig3, key="grafico_eventos_oleo")
 
     with col2:
         st.write("**Comportamento**")
@@ -97,10 +95,21 @@ with st.container(key="dados_pais_oleo"):
         if df_comp.empty:
             st.info("Nenhum registro encontrado.")
         else:
-            fig4 = px.bar(df_comp, x='oleo', y='frequencia', color='resposta', barmode='stack',
+            fig4 = px.bar(df_comp, x='oleo', y='frequencia', color='resposta', barmode='group',
+                          color_discrete_map=COMPORTAMENTO,
                           facet_row='pergunta',
                           labels={'oleo': 'Óleo', 'frequencia': 'Frequência', 'resposta': 'Resposta', 'pergunta': 'Pergunta'})
             st.plotly_chart(fig4, key="grafico_comportamento_oleo")
+    
+    st.write("**Eventos Adversos**")
+    df_yesno = query_execute(yes_no_frequency_by_oil())
+    if df_yesno.empty:
+        st.info("Nenhum registro encontrado.")
+    else:
+        fig3 = px.bar(df_yesno, x='oleo', y='frequencia', color='pergunta', barmode='group',
+                        color_discrete_map=EVENTOS_ADVERSOS,
+                        labels={'oleo': 'Óleo', 'frequencia': 'Frequência', 'pergunta': 'Pergunta'})
+        st.plotly_chart(fig3, key="grafico_eventos_oleo")
 
 st.header("Linha de Base vs Intervenção")
 
@@ -114,6 +123,7 @@ with st.container(key="baseline_vs_intervention"):
             st.info("Nenhum registro encontrado.")
         else:
             fig5 = px.bar(df_bv, x='dominio', y='media_valor', color='periodo', barmode='group',
+                          color_discrete_map=PERIODOS,
                           labels={'dominio': 'Domínio', 'media_valor': 'Média', 'periodo': 'Período'})
             st.plotly_chart(fig5, key="grafico_baseline_dominios")
 
@@ -123,7 +133,8 @@ with st.container(key="baseline_vs_intervention"):
         if df_sleep_bv.empty:
             st.info("Nenhum registro encontrado.")
         else:
-            fig6 = px.bar(df_sleep_bv, x='periodo', y='media_sono',
+            fig6 = px.bar(df_sleep_bv, x='periodo', y='media_sono', color='periodo',
+                          color_discrete_map=PERIODOS,
                           labels={'periodo': 'Período', 'media_sono': 'Média de Sono (h)'})
             st.plotly_chart(fig6, key="grafico_baseline_sono")
 
@@ -141,7 +152,8 @@ with st.container(key="comparacao_ambientes"):
     if df_env.empty:
         st.info("Nenhum registro encontrado.")
     else:
-        fig7 = px.bar(df_env, x='dominio', y='media_valor',
+        fig7 = px.bar(df_env, x='dominio', y='media_valor', color='dominio',
+                      color_discrete_sequence=SEQUENCIA_DOMINIOS,
                       labels={'dominio': 'Domínio', 'media_valor': 'Média'})
         st.plotly_chart(fig7, key="grafico_ambiente_dominios")
 
@@ -154,7 +166,8 @@ with st.container(key="comparacao_ambientes"):
         if df_sleep_amb.empty:
             st.info("Nenhum registro encontrado.")
         else:
-            fig8 = px.bar(df_sleep_amb, x='fase', y='media_valor',
+            fig8 = px.bar(df_sleep_amb, x='fase', y='media_valor', color='fase',
+                          color_discrete_map=FASES,
                           labels={'fase': 'Fase', 'media_valor': 'Média de Sono (h)'})
             st.plotly_chart(fig8, key="grafico_ambiente_sono")
 
@@ -164,6 +177,7 @@ with st.container(key="comparacao_ambientes"):
         if df_yesno_amb.empty:
             st.info("Nenhum registro encontrado.")
         else:
-            fig9 = px.bar(df_yesno_amb, x='descricao', y='frequencia',
+            fig9 = px.bar(df_yesno_amb, x='descricao', y='frequencia', color='descricao',
+                          color_discrete_map=EVENTOS_ADVERSOS,
                           labels={'descricao': 'Evento', 'frequencia': 'Frequência'})
             st.plotly_chart(fig9, key="grafico_ambiente_eventos")

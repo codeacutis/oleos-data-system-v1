@@ -20,5 +20,6 @@ Python, MySQL e Streamlit/Plotly Express
 - [x] Modelagem de Banco de Dados
 - [x] Carga em banco de dados
 - [x] Estrutura de Visualização
-- [] Segurança
-- [] Deploy
+- [x] Segurança
+- [x] Deploy (Railway + GitHub Actions)
+- [ ] Deploy Dashboard (Streamlit Community Cloud)

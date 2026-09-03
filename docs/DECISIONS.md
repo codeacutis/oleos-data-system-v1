@@ -141,3 +141,23 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 **Decisão**: O registro de LOGOUT na tabela `Auditoria` é feito detectando a chave `logout: true` no `session_state`, combinada com uma flag `_logout_registered` para evitar duplicatas.
 
 **Motivo**: O `streamlit-authenticator` limpa `username` do `session_state` antes do rerun causado pelo logout, tornando impossível capturar o usuário após o evento. A solução salva o username em `_current_user` a cada render autenticado e detecta o logout pela chave interna `logout` do authenticator. A flag `_logout_registered` é resetada apenas quando `logout` não está ativo, evitando registro duplicado no rerun seguinte ao login.
+
+---
+
+## DEC21 — Paleta semântica centralizada em `colors.py`
+
+**Decisão**: Todas as cores dos gráficos do dashboard foram centralizadas no arquivo `view/colors.py`, com constantes e dicionários de mapeamento importados por cada página.
+
+**Motivo**: Cores com significado (vermelho=negativo, verde=positivo, amarelo=atenção, cinza=referência) precisam ser consistentes em todo o dashboard. Centralizar em um único arquivo evita repetição, facilita ajustes futuros e garante que o mesmo evento (ex: resistência ao óleo) sempre aparecerá com a mesma cor em qualquer página. O arquivo expõe constantes (`VERDE`, `VERMELHO`, `AMARELO`, `LARANJA`, `AZUL`, `CINZA`), dicionários de mapeamento (`FASES`, `PERIODOS`, `SENTIMENTOS`, `AMBIENTES`, `COMPORTAMENTO`) e sequências (`SEQUENCIA_NEUTRA`, `SEQUENCIA_DOMINIOS`, `SEQUENCIA_OLEOS`).
+
+---
+
+## DEC22 — Rótulos curtos via `CASE WHEN LIKE` nas queries
+
+**Decisão**: As queries `yes_no_frequency`, `yes_no_frequency_by_fase` e `yes_no_frequency_by_oil` usam `CASE WHEN descricao LIKE` para mapear descrições longas das opções categóricas para rótulos curtos diretamente no SQL.
+
+**Motivo**: As descrições originais no banco são frases completas (ex: "Sim, houve mudança na rotina"), inadequadas para exibição em gráficos. Fazer o mapeamento no SQL evita lógica de renomeação espalhada nas páginas e mantém os DataFrames já prontos para visualização.
+
+**Decisão**: A autenticação com a Google Sheets API foi migrada de OAuth2 (`token.json` + `client_secret.json`) para Service Account (`service_account.json`).
+
+**Motivo**: O OAuth2 exige interação do usuário para gerar o token inicial e o token expira periodicamente, tornando o fluxo incompatível com ambientes headless como o GitHub Actions. A Service Account usa uma chave permanente que nunca expira e não requer nenhuma interação, resolvendo o travamento da pipeline.

@@ -8,6 +8,7 @@ from view.queries import (adhesion_by_responsible, feeling_by_fase, feeling_evol
 from view.db import query_execute
 import streamlit as st
 import plotly.express as px
+from view.colors import SENTIMENTOS, SEQUENCIA_NEUTRA, VERMELHO, AMARELO
 
 st.title("Adesão e Qualidade", text_alignment="center")
 
@@ -27,6 +28,7 @@ else:
         color="fase",
         orientation="h",
         barmode="group",
+        color_discrete_sequence=SEQUENCIA_NEUTRA,
         labels={"total_registros": "Registros", "responsavel": "Responsável", "fase": "Fase"},
     )
     fig1.update_layout(yaxis={"categoryorder": "total ascending"})
@@ -44,7 +46,7 @@ fase_sentimento = st.selectbox(
 
 df_feeling = query_execute(*feeling_by_fase(fase_sentimento))
 
-col_left, col_right = st.columns(2)
+col_left, col_right = st.columns([1, 1], gap="medium")
 
 with col_left:
     st.subheader("Frequência por Sentimento")
@@ -52,7 +54,7 @@ with col_left:
         st.info("Nenhum registro encontrado.")
     else:
         fig_bar = px.bar(df_feeling, x="sentimento", y="frequencia",
-                         barmode="group",
+                         color_discrete_map=SENTIMENTOS,
                          labels={"frequencia": "Frequência", "sentimento": "Sentimento"},
                          color="sentimento")
         st.plotly_chart(fig_bar, key="grafico_sentimento_barra")
@@ -62,7 +64,8 @@ with col_right:
     if df_feeling.empty:
         st.info("Nenhum registro encontrado.")
     else:
-        fig_pie = px.pie(df_feeling, names="sentimento", values="frequencia", hole=0.45)
+        fig_pie = px.pie(df_feeling, names="sentimento", values="frequencia", hole=0.45,
+                         color="sentimento", color_discrete_map=SENTIMENTOS)
         fig_pie.update_traces(textposition="inside", textinfo="percent+label")
         st.plotly_chart(fig_pie, key="grafico_sentimento_donut")
 
@@ -73,6 +76,7 @@ if df_feeling_evo.empty:
 else:
     fig_evo = px.bar(df_feeling_evo, x="fase", y="frequencia", color="sentimento",
                      barmode="group",
+                     color_discrete_map=SENTIMENTOS,
                      labels={"frequencia": "Frequência", "fase": "Fase", "sentimento": "Sentimento"})
     st.plotly_chart(fig_evo, key="grafico_sentimento_evolucao")
 
@@ -90,7 +94,8 @@ else:
         x="fase",
         y="frequencia",
         labels={"frequencia": "Ocorrências", "fase": "Fase"},
-        color="fase"
+        color="fase",
+        color_discrete_sequence=[VERMELHO]
     )
     st.plotly_chart(fig4, key="grafico_resistencia")
 
@@ -108,6 +113,7 @@ else:
         x="fase",
         y="frequencia",
         labels={"frequencia": "Ocorrências", "fase": "Fase"},
-        color="fase"
+        color="fase",
+        color_discrete_sequence=[AMARELO]
     )
     st.plotly_chart(fig5, key="grafico_rotina")

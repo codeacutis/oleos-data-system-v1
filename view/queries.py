@@ -5,7 +5,7 @@ queries = {
     'total_pais':'SELECT count(*) AS total_pais FROM observador WHERE tipo = "RESPONSAVEL"',
     'total_professores': 'SELECT count(*) AS total_professores FROM observador WHERE tipo = "PROFESSOR"',
     'total_criancas_turno': 'SELECT count(*) AS criancas, turno AS turno FROM crianca GROUP BY turno',
-    'criancas_por_fase': 'SELECT count(*) AS criancas, f.nome_fase AS fase from crianca c INNER JOIN registro r ON c.id_crianca = r.id_crianca INNER JOIN fase_estudo f ON f.id_fase = r.id_fase GROUP BY fase',
+    'criancas_por_fase': 'SELECT count(DISTINCT c.id_crianca) AS criancas, f.nome_fase AS fase from crianca c INNER JOIN registro r ON c.id_crianca = r.id_crianca INNER JOIN fase_estudo f ON f.id_fase = r.id_fase GROUP BY fase',
     'registros_por_data': 'SELECT count(*) AS registros, data FROM registro GROUP BY data',
     'codigos_criancas': 'SELECT codigo FROM crianca',
     'nomes_fases': 'SELECT nome_fase FROM fase_estudo'
@@ -78,7 +78,15 @@ def avg_sleep_by_parents(option):
 def yes_no_frequency(option):
     return (
         '''
-        SELECT c.codigo AS codigo_crianca, ie.descricao AS descricao, fe.nome_fase AS fase, count(*) AS frequencia
+        SELECT c.codigo AS codigo_crianca,
+            CASE
+                WHEN ie.descricao LIKE "%ansiedade%" THEN "Sinais de ansiedade"
+                WHEN ie.descricao LIKE "%rotina%" THEN "Mudanças de rotina"
+                WHEN ie.descricao LIKE "%agitação%" THEN "Agitação noturna"
+                WHEN ie.descricao LIKE "%resistência%" THEN "Resistência de Aplicação"
+                ELSE ie.descricao
+            END AS descricao,
+            fe.nome_fase AS fase, count(*) AS frequencia
         FROM resposta r
         INNER JOIN item_escala ie ON ie.id_item = r.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
@@ -176,7 +184,15 @@ def avg_sleep_by_oil():
 
 def yes_no_frequency_by_oil():
     return '''
-        SELECT o.nome AS oleo, ie.descricao AS pergunta, count(*) AS frequencia
+        SELECT o.nome AS oleo,
+            CASE
+                WHEN ie.descricao LIKE "%ansiedade%" THEN "Sinais de ansiedade"
+                WHEN ie.descricao LIKE "%rotina%" THEN "Mudanças de rotina"
+                WHEN ie.descricao LIKE "%agitação%" THEN "Agitação noturna"
+                WHEN ie.descricao LIKE "%resistência%" THEN "Resistência de Aplicação"
+                ELSE ie.descricao
+            END AS pergunta,
+            count(*) AS frequencia
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
@@ -188,7 +204,12 @@ def yes_no_frequency_by_oil():
 
 def comportamental_by_oil():
     return '''
-        SELECT o.nome AS oleo, ie.descricao AS pergunta, oc.descricao AS resposta, count(*) AS frequencia
+        SELECT o.nome AS oleo,
+            CASE r.id_item
+                WHEN 22 THEN "Foi para Escola"
+                WHEN 23 THEN "Voltou da Escola"
+            END AS pergunta,
+            oc.descricao AS resposta, count(*) AS frequencia
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN opcao_categorica oc ON oc.id_opcao = r.id_opcao
@@ -301,7 +322,14 @@ def avg_sleep_by_parents_by_fase(fase):
 def yes_no_frequency_by_fase(fase):
     return (
         '''
-        SELECT ie.descricao AS descricao, count(*) AS frequencia
+        SELECT
+            CASE
+                WHEN ie.descricao LIKE "%ansiedade%" THEN "Sinais de ansiedade"
+                WHEN ie.descricao LIKE "%rotina%" THEN "Mudanças de rotina"
+                WHEN ie.descricao LIKE "%agitação%" THEN "Agitação noturna"
+                ELSE ie.descricao
+            END AS descricao,
+            count(*) AS frequencia
         FROM resposta r
         INNER JOIN item_escala ie ON r.id_item = ie.id_item
         INNER JOIN registro re ON r.id_registro = re.id_registro
