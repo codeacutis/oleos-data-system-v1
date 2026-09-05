@@ -131,10 +131,10 @@ app.py
 
 ---
 
-## Em desenvolvimento
+## Backup
 
-* Deploy no Streamlit Community Cloud
-* Mecanismo de backup
+* Script `backup.py` na raiz do projeto executa `mysqldump` e salva o dump em `backups/` (não versionado)
+* Agendado via Agendador de Tarefas do Windows — roda automaticamente 30 minutos após a inicialização do sistema
 
 ---
 
@@ -190,7 +190,7 @@ streamlit run view/main.py
 
 ## Status
 
-O pipeline ETL, as 4 páginas do dashboard e a autenticação estão concluídos. O banco de dados está hospedado no Railway e o ETL roda automaticamente todo dia via GitHub Actions. O projeto encontra-se na fase de deploy do dashboard.
+O projeto está concluído. O pipeline ETL, as 4 páginas do dashboard, a autenticação e o mecanismo de backup estão implementados. O banco de dados está hospedado no Railway, o ETL roda automaticamente todo dia via GitHub Actions e o dashboard está publicado no Streamlit Community Cloud.
 
 ---
 
@@ -207,6 +207,7 @@ Durante o desenvolvimento deste projeto foram aplicados conceitos de:
 * Segurança e autenticação de usuários
 * Organização em camadas
 * Automação de processos de coleta de dados
+* Backup e recuperação de dados
 
 ---
 
