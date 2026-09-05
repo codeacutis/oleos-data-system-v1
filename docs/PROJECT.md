@@ -21,5 +21,5 @@ Python, MySQL e Streamlit/Plotly Express
 - [x] Carga em banco de dados
 - [x] Estrutura de Visualização
 - [x] Segurança
-- [x] Deploy (Railway + GitHub Actions)
-- [ ] Deploy Dashboard (Streamlit Community Cloud)
+- [x] Deploy (Railway + GitHub Actions + Streamlit Community Cloud)
+- [x] Backup automático local

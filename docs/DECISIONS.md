@@ -144,7 +144,11 @@ Registro das principais decisões tomadas ao longo do desenvolvimento e suas jus
 
 ---
 
-## DEC21 — Paleta semântica centralizada em `colors.py`
+## DEC23 — Backup local via `mysqldump` + Agendador de Tarefas
+
+**Decisão**: O backup do banco é feito por um script `backup.py` na raiz do projeto que executa `mysqldump` e salva o dump em `backups/` (não versionado). O script é agendado via Agendador de Tarefas do Windows para rodar 30 minutos após a inicialização do sistema.
+
+**Motivo**: O banco está no Railway, que não oferece backup automático no plano gratuito. A abordagem local é simples, sem custo adicional e sem dependência de novos serviços. O atraso de 30 minutos garante que o login do usuário já ocorreu antes da execução. Os backups não são versionados pois contêm dados sensíveis dos participantes da pesquisa. em `colors.py`
 
 **Decisão**: Todas as cores dos gráficos do dashboard foram centralizadas no arquivo `view/colors.py`, com constantes e dicionários de mapeamento importados por cada página.
 

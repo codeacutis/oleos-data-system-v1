@@ -17,7 +17,7 @@
 - [x] Página: Comparações
 - [x] Página: Adesão e Qualidade
 
-### 🔄 Fase 3 — Segurança e Deploy
+### ✅ Fase 3 — Segurança e Deploy
 - [x] Autenticação com `streamlit-authenticator`
 - [x] Credenciais em `st.secrets`
 - [x] Proteção das páginas por login
@@ -27,7 +27,7 @@
 - [x] Migrar banco MySQL para nuvem (Railway)
 - [x] Deploy no Streamlit Community Cloud
 - [x] Configurar GitHub Actions para ETL diário
-- [ ] Mecanismo de backup
+- [x] Mecanismo de backup
 
 ---
 

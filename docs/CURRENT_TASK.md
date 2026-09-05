@@ -69,13 +69,15 @@
 - Condicional de dados vazios em todos os gráficos
 - Cores semânticas aplicadas via `view/colors.py`
 
+#### Backup
+- Script `backup.py` na raiz do projeto
+- Dump SQL via `mysqldump` salvo em `backups/db_oleos_YYYY-MM-DD_HH-MM-SS.sql`
+- Pasta `backups/` no `.gitignore` (não versionada)
+- Agendado via Agendador de Tarefas do Windows — executa 30 minutos após a inicialização do sistema
+
 ---
 
 ### 🔄 Em Andamento
-
-#### Infraestrutura
-- Deploy no Streamlit Community Cloud
-- Mecanismo de backup
 
 ---
 
